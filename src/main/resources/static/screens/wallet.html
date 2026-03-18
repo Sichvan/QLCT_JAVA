@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ví của tôi - ExpensePro</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class="material-icons">account_balance_wallet</i> ExpensePro
+            </div>
+            <nav class="sidebar-menu">
+                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
+                <a href="/screens/wallet.html" class="menu-item active"><i class="material-icons">account_balance</i> Ví của tôi</a>
+                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h1 class="page-title">Ví của tôi</h1>
+                <div class="user-profile" onclick="window.location.href='/screens/settings.html'" style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                    <span id="header-user-name" style="font-weight: 600; color: var(--text-main); font-size: 15px;">Người dùng</span>
+                    <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; background-color: var(--primary-color); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; color: white; box-shadow: var(--shadow-sm);">
+                        <i class="material-icons" id="header-avatar-icon">person</i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <div class="card gradient-card text-center" style="padding: 40px 24px; border-radius: 24px;">
+                    <div class="stat-label" style="color: rgba(255,255,255,0.85); font-size: 14px;">TỔNG TÀI SẢN</div>
+                    <div class="stat-value" id="wallet-balance" style="font-size: 44px; margin: 16px 0; font-weight: 700;">0 ₫</div>
+                    
+                    <div class="flex-between" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 24px; margin-top: 24px;">
+                        <div style="text-align: left; flex: 1;">
+                            <span style="font-size: 13px; color: rgba(255,255,255,0.85); text-transform: uppercase; font-weight: 600;">
+                                <i class="material-icons" style="font-size: 16px; vertical-align: bottom;">arrow_upward</i> Cho vay
+                            </span>
+                            <div id="wallet-lending" class="bold" style="font-size: 20px; margin-top: 6px;">0 ₫</div>
+                        </div>
+                        <div style="width: 1px; height: 40px; background: rgba(255,255,255,0.3);"></div>
+                        <div style="text-align: right; flex: 1;">
+                            <span style="font-size: 13px; color: rgba(255,255,255,0.85); text-transform: uppercase; font-weight: 600;">
+                                Đang nợ <i class="material-icons" style="font-size: 16px; vertical-align: bottom;">arrow_downward</i>
+                            </span>
+                            <div id="wallet-borrowing" class="bold" style="font-size: 20px; margin-top: 6px;">0 ₫</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 style="font-size: 20px; font-weight: 600; margin: 32px 0 20px; color: var(--text-main);">Tiện ích</h2>
+                
+                <div class="grid-cards" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px;">
+                    <a href="/screens/budget_page.html" class="card text-center" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; cursor: pointer;">
+                        <div style="width: 64px; height: 64px; border-radius: 20px; background: rgba(147, 51, 234, 0.1); display: flex; align-items: center; justify-content: center;">
+                            <i class="material-icons" style="color: #9333ea; font-size: 32px;">pie_chart</i>
+                        </div>
+                        <span class="bold" style="font-size: 15px;">Ngân sách</span>
+                    </a>
+                    
+                    <a href="/screens/goal_page.html" class="card text-center" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; cursor: pointer;">
+                        <div style="width: 64px; height: 64px; border-radius: 20px; background: rgba(20, 184, 166, 0.1); display: flex; align-items: center; justify-content: center;">
+                            <i class="material-icons" style="color: #14b8a6; font-size: 32px;">flag</i>
+                        </div>
+                        <span class="bold" style="font-size: 15px;">Mục tiêu</span>
+                    </a>
+                    
+                    <a href="#" onclick="exportToExcel(); return false;" class="card text-center" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; cursor: pointer;">
+                        <div style="width: 64px; height: 64px; border-radius: 20px; background: rgba(249, 115, 22, 0.1); display: flex; align-items: center; justify-content: center;">
+                            <i class="material-icons" style="color: #f97316; font-size: 32px;">cloud_download</i>
+                        </div>
+                        <span class="bold" style="font-size: 15px;">Xuất dữ liệu</span>
+                    </a>
+                    
+                    <a href="/screens/recurring_page.html" class="card text-center" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; cursor: pointer;">
+                        <div style="width: 64px; height: 64px; border-radius: 20px; background: rgba(79, 70, 229, 0.1); display: flex; align-items: center; justify-content: center;">
+                            <i class="material-icons" style="color: #4f46e5; font-size: 32px;">event_repeat</i>
+                        </div>
+                        <span class="bold" style="font-size: 15px;">Định kỳ</span>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="/screens/home.html" class="nav-item"><i class="material-icons">home</i><span>Trang chủ</span></a>
+            <a href="/screens/wallet.html" class="nav-item active"><i class="material-icons">account_balance_wallet</i><span>Ví</span></a>
+            <a href="/screens/transaction_add.html" class="nav-item" style="position: relative;">
+                <div class="fab-mobile"><i class="material-icons" style="font-size: 28px;">add</i></div>
+                <span style="opacity: 0;">Add</span>
+            </a>
+            <a href="/screens/stats.html" class="nav-item"><i class="material-icons">pie_chart</i><span>Thống kê</span></a>
+            <a href="/screens/settings.html" class="nav-item"><i class="material-icons">person</i><span>Cá nhân</span></a>
+        </nav>
+    </div>
+    
+    <script src="/js/wallet.js"></script>
+    <script>
+        // SCRIPT ĐỂ TẢI TÊN VÀ AVATAR KHI VÀO TRANG VÍ
+        document.addEventListener('DOMContentLoaded', () => {
+            if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+            
+            const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+            document.getElementById('header-user-name').textContent = userInfo.fullName || userInfo.username || 'User';
+            
+            const savedAvatar = localStorage.getItem('user_avatar');
+            if (savedAvatar) {
+                const headAvt = document.getElementById('header-avatar');
+                headAvt.style.backgroundImage = `url("${savedAvatar}")`;
+                document.getElementById('header-avatar-icon').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

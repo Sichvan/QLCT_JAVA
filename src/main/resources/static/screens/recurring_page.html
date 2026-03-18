@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Định Kỳ - ExpensePro</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+    <style>
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 24px; padding: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: 0.3s; }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;}
+        .form-control { width: 100%; padding: 14px 16px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 15px; outline: none; transition: 0.3s; background: var(--bg-color); color: var(--text-main);}
+        .form-control:focus { border-color: var(--primary-color); background: var(--card-bg); }
+        .modal-actions { display: flex; gap: 12px; margin-top: 32px; }
+        .btn-cancel { flex: 1; padding: 14px; border-radius: 12px; border: none; background: #f1f5f9; color: #1f2937; font-weight: 600; cursor: pointer; transition: 0.2s;}
+        .btn-submit { flex: 1; padding: 14px; border-radius: 12px; border: none; background: var(--primary-color); color: white; font-weight: 600; cursor: pointer; transition: 0.2s;}
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> ExpensePro</div>
+            <nav class="sidebar-menu">
+                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
+                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
+                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
+            </nav>
+            <div class="sidebar-footer"><a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a></div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div onclick="window.location.href='/screens/wallet.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'">
+                        <i class="material-icons">arrow_back</i>
+                    </div>
+                    <h1 class="page-title">Lịch tự động</h1>
+                </div>
+            </header>
+
+            <div class="content-area" style="max-width: 800px;">
+                <div class="flex-between" style="margin-bottom: 24px;">
+                    <h2 style="font-size: 20px; font-weight: 600;">Danh sách định kỳ</h2>
+                    <button class="btn-primary" onclick="openModal()"><i class="material-icons">add</i> Thêm mới</button>
+                </div>
+                <div id="recurring-list"><p class="text-center" style="color: var(--text-muted);">Đang tải dữ liệu...</p></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="recurringModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 24px; font-size: 20px;">Tạo lịch tự động</h2>
+            
+            <div style="display: flex; gap: 12px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Loại</label>
+                    <select id="rec-type" class="form-control" style="background-image: none;">
+                        <option value="expense">Chi tiêu</option>
+                        <option value="income">Thu nhập</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Ngày (1-31)</label>
+                    <input type="number" id="rec-day" class="form-control" placeholder="VD: 15" min="1" max="31">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Số tiền (VNĐ)</label>
+                <input type="tel" id="rec-amount" class="form-control" placeholder="VD: 1.500.000" style="font-size: 20px; font-weight: bold; color: var(--primary-color);" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Ghi chú (Tên giao dịch)</label>
+                <input type="text" id="rec-note" class="form-control" placeholder="VD: Đóng tiền trọ">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">HỦY</button>
+                <button class="btn-submit" onclick="submitRecurring()">LƯU LỊCH</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+
+        const token = localStorage.getItem('jwt_token');
+        if (!token) window.location.href = '/index.html';
+
+        function setupCurrencyInput(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            let isComposing = false;
+            input.addEventListener('compositionstart', () => { isComposing = true; });
+            input.addEventListener('compositionend', () => { isComposing = false; formatInput(input); });
+            input.addEventListener('input', () => { if (!isComposing) formatInput(input); });
+            function formatInput(el) {
+                let cursorPosition = el.selectionStart;
+                let originalLength = el.value.length;
+                let val = el.value.replace(/\D/g, ''); 
+                if (val !== '') {
+                    el.value = parseInt(val, 10).toLocaleString('vi-VN');
+                    let newLength = el.value.length;
+                    cursorPosition = cursorPosition + (newLength - originalLength);
+                    el.setSelectionRange(cursorPosition, cursorPosition);
+                } else { el.value = ''; }
+            }
+        }
+
+        setupCurrencyInput('rec-amount');
+
+        function getRawNumber(formattedStr) {
+            if (!formattedStr) return 0;
+            return parseInt(formattedStr.toString().replace(/\D/g, ''), 10) || 0;
+        }
+
+        const formatCurrencyText = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+
+        async function fetchRecurring() {
+            try {
+                const response = await fetch('/api/recurring', { headers: { 'Authorization': `Bearer ${token}` } });
+                const recurrings = await response.json();
+                const listDiv = document.getElementById('recurring-list');
+
+                if (recurrings.length === 0) {
+                    listDiv.innerHTML = `<div class="text-center" style="color: grey; margin-top: 40px;"><i class="material-icons" style="font-size: 64px; opacity: 0.5;">event_repeat</i><p style="margin-top: 10px;">Chưa có thiết lập định kỳ nào</p></div>`;
+                    return;
+                }
+
+                listDiv.innerHTML = recurrings.map(item => {
+                    const isExpense = item.type === 'expense';
+                    const color = isExpense ? 'var(--danger-color)' : 'var(--success-color)';
+                    const bgIcon = isExpense ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+                    const sign = isExpense ? '-' : '+';
+
+                    return `
+                        <div class="card" style="display: flex; align-items: center; padding: 20px;">
+                            <div style="background: ${bgIcon}; color: ${color}; padding: 12px; border-radius: 14px; margin-right: 16px; display: flex; align-items: center; justify-content: center;">
+                                <i class="material-icons">autorenew</i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div class="bold" style="font-size: 16px; color: var(--text-main);">${item.note || 'Giao dịch tự động'}</div>
+                                <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 500;">Tự động trừ vào ngày ${item.dayOfMonth} hàng tháng</div>
+                            </div>
+                            <div style="text-align: right; display: flex; align-items: center; gap: 16px;">
+                                <div class="bold" style="color: ${color}; font-size: 18px;">${sign}${formatCurrencyText(item.amount)}</div>
+                                <i class="material-icons" style="color: var(--danger-color); cursor: pointer; padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 8px;" onclick="deleteRecurring('${item.id}')">delete</i>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) { console.error(err); }
+        }
+
+        async function deleteRecurring(id) {
+            if (confirm("Bạn có chắc muốn xóa lịch tự động này?")) {
+                await fetch(`/api/recurring/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                fetchRecurring();
+            }
+        }
+
+        function openModal() { document.getElementById('recurringModal').classList.add('active'); }
+        function closeModal() { document.getElementById('recurringModal').classList.remove('active'); document.getElementById('rec-amount').value = ''; document.getElementById('rec-day').value = ''; document.getElementById('rec-note').value = ''; }
+        
+        async function submitRecurring() {
+            const type = document.getElementById('rec-type').value;
+            const amount = getRawNumber(document.getElementById('rec-amount').value);
+            const day = document.getElementById('rec-day').value;
+            const note = document.getElementById('rec-note').value;
+
+            if (amount <= 0) return alert("Số tiền không hợp lệ!");
+            if (!day || day < 1 || day > 31) return alert("Ngày trong tháng phải từ 1 đến 31!");
+
+            try {
+                await fetch('/api/recurring', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: type, amount: amount, dayOfMonth: parseInt(day), category: 'other_expense', categoryName: 'Định kỳ', note: note })
+                });
+                closeModal();
+                fetchRecurring();
+            } catch (e) { alert("Lỗi kết nối!"); }
+        }
+
+        fetchRecurring();
+    </script>
+</body>
+</html>

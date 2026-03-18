@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #4361ee;
+    --primary-hover: #3730a3;
+    --secondary-color: #f72585;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --bg-color: #f4f6f8;
+    --card-bg: #ffffff;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --sidebar-width: 260px;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-md: 0 8px 24px rgba(149, 157, 165, 0.15);
+    --shadow-hover: 0 12px 32px rgba(67, 97, 238, 0.2);
+    --radius-md: 16px;
+    --radius-lg: 24px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+body { background-color: var(--bg-color); color: var(--text-main); transition: background-color 0.3s, color 0.3s; overflow-x: hidden; }
+
+/* --- LAYOUT TỔNG --- */
+.dashboard-layout { display: flex; height: 100vh; overflow: hidden; }
+
+/* --- SIDEBAR --- */
+.sidebar {
+    width: var(--sidebar-width); background: var(--card-bg);
+    border-right: 1px solid var(--border-color);
+    display: flex; flex-direction: column; padding: 24px 0;
+    transition: 0.3s; z-index: 100;
+}
+.sidebar-logo {
+    padding: 0 24px; color: var(--text-main);
+    font-weight: 700; font-size: 24px; margin-bottom: 40px;
+    display: flex; align-items: center; gap: 12px;
+}
+.sidebar-logo i { 
+    font-size: 32px; 
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+}
+
+.menu-item {
+    display: flex; align-items: center; gap: 16px; padding: 14px 20px;
+    color: var(--text-muted); text-decoration: none; font-weight: 500; 
+    transition: all 0.3s ease; margin: 4px 16px; border-radius: 12px;
+}
+.menu-item:hover { background: rgba(67, 97, 238, 0.05); color: var(--primary-color); transform: translateX(4px); }
+.menu-item.active {
+    background: var(--primary-color); color: white;
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+.sidebar-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
+
+/* --- MAIN CONTENT --- */
+.main-content { flex: 1; overflow-y: auto; background: var(--bg-color); position: relative; scroll-behavior: smooth; }
+.topbar {
+    background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px);
+    padding: 20px 32px; border-bottom: 1px solid var(--border-color);
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 50; transition: 0.3s;
+}
+.page-title { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--text-main); }
+.content-area { padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; animation: fadeIn 0.4s ease-out; }
+
+/* --- CARDS --- */
+.card {
+    background: var(--card-bg); border-radius: var(--radius-md);
+    padding: 24px; margin-bottom: 24px; border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm); transition: all 0.3s ease;
+}
+.card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+
+/* Thẻ Gradient đẹp cho số dư */
+.gradient-card {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #3a0ca3 100%);
+    color: white; border: none; box-shadow: 0 10px 24px rgba(67, 97, 238, 0.35);
+    position: relative; overflow: hidden;
+}
+.gradient-card::after {
+    content: ''; position: absolute; top: -50%; right: -20%;
+    width: 200px; height: 200px; background: rgba(255,255,255,0.1);
+    border-radius: 50%; transform: rotate(45deg);
+}
+.gradient-card .stat-label { color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+.gradient-card .stat-value { color: white; font-size: 36px; font-weight: 700; margin: 8px 0; }
+
+/* --- BUTTONS --- */
+.btn-primary {
+    background: var(--primary-color); color: white;
+    border: none; padding: 12px 24px; border-radius: 12px;
+    font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.3s; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2); font-size: 15px;
+}
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+
+/* --- UTILITIES --- */
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.bold { font-weight: 600; }
+.text-center { text-align: center; }
+.text-success { color: var(--success-color); }
+.text-danger { color: var(--danger-color); }
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px;}
+
+/* --- TRANSACTION LIST (Danh sách giao dịch) --- */
+.tx-item {
+    display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--border-color);
+    transition: 0.2s; border-radius: 12px; margin-bottom: 4px;
+}
+.tx-item:hover { background: var(--bg-color); cursor: pointer; transform: scale(1.01); }
+.tx-item:last-child { border-bottom: none; }
+.tx-icon-wrapper {
+    width: 52px; height: 52px; border-radius: 14px; background: #f1f5f9;
+    display: flex; justify-content: center; align-items: center; margin-right: 18px;
+}
+.tx-info { flex: 1; }
+.tx-title { font-weight: 600; font-size: 16px; margin-bottom: 4px; color: var(--text-main); }
+.tx-date { font-size: 13px; color: var(--text-muted); }
+.tx-amount { font-weight: 700; font-size: 16px; }
+
+/* --- PROGRESS BAR (Thanh tiến trình) --- */
+.progress-bar { width: 100%; height: 10px; background: var(--border-color); border-radius: 8px; margin: 16px 0 12px 0; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--success-color); border-radius: 8px; transition: 1s ease-out; }
+.progress-fill.warning { background: var(--warning-color); }
+.progress-fill.danger { background: var(--danger-color); }
+
+/* --- DARK MODE --- */
+body.dark-mode {
+    --bg-color: #121212; --card-bg: #1c1c1e; --text-main: #f3f4f6;
+    --text-muted: #a1a1aa; --border-color: #2c2c2e;
+}
+body.dark-mode .topbar { background: rgba(28, 28, 30, 0.85); }
+body.dark-mode .tx-icon-wrapper { background: #2c2c2e; }
+body.dark-mode .tx-item:hover { background: #2c2c2e; }
+
+/* ANIMATION */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- MOBILE BOTTOM NAV --- */
+.bottom-nav { display: none; }
+@media (max-width: 768px) {
+    .dashboard-layout { flex-direction: column; }
+    .sidebar { display: none; }
+    .content-area { padding: 20px; padding-bottom: 100px; } /* Tránh bị che bởi nav */
+    .grid-cards { grid-template-columns: 1fr; }
+    .bottom-nav {
+        display: flex; justify-content: space-around; background: var(--card-bg);
+        padding: 10px 0 15px; border-top: 1px solid var(--border-color);
+        position: fixed; bottom: 0; width: 100%; z-index: 100; box-shadow: 0 -4px 16px rgba(0,0,0,0.05);
+    }
+    .nav-item {
+        display: flex; flex-direction: column; align-items: center; color: var(--text-muted);
+        text-decoration: none; font-size: 11px; font-weight: 500; gap: 4px; transition: 0.3s;
+    }
+    .nav-item.active { color: var(--primary-color); transform: translateY(-2px); }
+    .fab-mobile {
+        background: linear-gradient(135deg, var(--primary-color), #3a0ca3); color: white; width: 56px; height: 56px;
+        border-radius: 50%; display: flex; justify-content: center; align-items: center;
+        position: absolute; top: -28px; box-shadow: 0 4px 16px rgba(67, 97, 238, 0.4); border: 4px solid var(--bg-color);
+    }
+}

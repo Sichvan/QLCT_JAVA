@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài đặt - ExpensePro</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+    <style>
+        /* Hiệu ứng Avatar khi hover */
+        .avatar-container { position: relative; cursor: pointer; border-radius: 50%; overflow: hidden; }
+        .avatar-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: white; opacity: 0; transition: 0.3s;
+        }
+        .avatar-container:hover .avatar-overlay { opacity: 1; }
+    </style>
+</head>
+<body onload="initSettings();">
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> ExpensePro</div>
+            <nav class="sidebar-menu">
+                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
+                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
+                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/screens/settings.html" class="menu-item active"><i class="material-icons">settings</i> Cài đặt</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h1 class="page-title">Cài đặt cá nhân</h1>
+            </header>
+            
+            <div class="content-area" style="max-width: 800px;">
+                
+                <div class="card" style="display: flex; align-items: center; padding: 32px 24px; gap: 24px; border-radius: 20px;">
+                    
+                    <div class="avatar-container" onclick="document.getElementById('avatar-upload').click();">
+                        <div id="avatar-display" style="width: 88px; height: 88px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; box-shadow: 0 8px 16px rgba(67, 97, 238, 0.25); background-size: cover; background-position: center;">
+                            <i class="material-icons" id="avt-icon" style="font-size: 48px;">person</i>
+                        </div>
+                        <div class="avatar-overlay">
+                            <i class="material-icons" style="font-size: 20px;">photo_camera</i>
+                            <span style="font-size: 10px; font-weight: bold; margin-top: 4px;">SỬA ẢNH</span>
+                        </div>
+                    </div>
+                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+
+                    <div>
+                        <h2 id="profile-name" class="bold" style="font-size: 24px; color: var(--text-main); margin-bottom: 4px;">Người Dùng</h2>
+                        <p id="profile-email" style="color: var(--text-muted); font-size: 15px;"></p>
+                    </div>
+                </div>
+
+                <h3 style="margin: 32px 0 16px; font-size: 16px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; padding-left: 8px;">Tùy chọn hệ thống</h3>
+                
+                <div class="card" style="padding: 0; overflow: hidden; border-radius: 20px;">
+                    
+                    <div class="setting-item" onclick="toggleDarkMode()" style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: 0.2s;">
+                        <div style="width: 40px; height: 40px; border-radius: 12px; background: #1e293b; color: white; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
+                            <i class="material-icons">brightness_6</i>
+                        </div>
+                        <span style="flex: 1; font-weight: 500; font-size: 16px;">Giao diện Tối (Dark Mode)</span>
+                        <i class="material-icons" id="dark-icon" style="font-size: 32px; color: var(--border-color); transition: 0.3s;">toggle_off</i>
+                    </div>
+                    
+                    <a href="/screens/category_management.html" class="setting-item" style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border-color); text-decoration: none; color: inherit; transition: 0.2s;">
+                        <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
+                            <i class="material-icons">category</i>
+                        </div>
+                        <span style="flex: 1; font-weight: 500; font-size: 16px;">Quản lý Danh mục</span>
+                        <i class="material-icons" style="color: var(--text-muted);">chevron_right</i>
+                    </a>
+
+                    <a href="/screens/account_edit.html" class="setting-item" style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border-color); text-decoration: none; color: inherit; transition: 0.2s;">
+                        <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(67, 97, 238, 0.1); color: #4361ee; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
+                            <i class="material-icons">manage_accounts</i>
+                        </div>
+                        <span style="flex: 1; font-weight: 500; font-size: 16px;">Sửa mật khẩu & thông tin</span>
+                        <i class="material-icons" style="color: var(--text-muted);">chevron_right</i>
+                    </a>
+
+                    <div class="setting-item" onclick="logout()" style="display: flex; align-items: center; padding: 20px 24px; cursor: pointer; transition: 0.2s;">
+                        <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); color: #ef4444; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
+                            <i class="material-icons">logout</i>
+                        </div>
+                        <span style="flex: 1; font-weight: 600; font-size: 16px; color: #ef4444;">Đăng xuất an toàn</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="/screens/home.html" class="nav-item"><i class="material-icons">home</i><span>Trang chủ</span></a>
+            <a href="/screens/wallet.html" class="nav-item"><i class="material-icons">account_balance_wallet</i><span>Ví</span></a>
+            <a href="/screens/transaction_add.html" class="nav-item" style="position: relative;">
+                <div class="fab-mobile"><i class="material-icons" style="font-size: 28px;">add</i></div>
+                <span style="opacity: 0;">Add</span>
+            </a>
+            <a href="/screens/stats.html" class="nav-item"><i class="material-icons">pie_chart</i><span>Thống kê</span></a>
+            <a href="/screens/settings.html" class="nav-item active"><i class="material-icons">person</i><span>Cá nhân</span></a>
+        </nav>
+    </div>
+    
+    <script>
+        function initSettings() {
+            if(localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('dark-icon').textContent = 'toggle_on';
+                document.getElementById('dark-icon').style.color = 'var(--primary-color)';
+            }
+            const ui = JSON.parse(localStorage.getItem('user_info') || '{}');
+            document.getElementById('profile-name').textContent = ui.fullName || ui.username;
+            document.getElementById('profile-email').textContent = ui.username;
+            
+            const savedAvt = localStorage.getItem('user_avatar');
+            if(savedAvt) {
+                document.getElementById('avatar-display').style.backgroundImage = `url(${savedAvt})`;
+                document.getElementById('avt-icon').style.display = 'none';
+            }
+        }
+
+        // TẢI ẢNH LÊN (LƯU LOCALSTORAGE)
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Image = e.target.result;
+                    // Lưu vào localStorage
+                    localStorage.setItem('user_avatar', base64Image);
+                    // Hiển thị ngay lập tức
+                    document.getElementById('avatar-display').style.backgroundImage = `url(${base64Image})`;
+                    document.getElementById('avt-icon').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            window.location.reload(); 
+        }
+
+        function logout() {
+            if(confirm("Bạn có chắc chắn muốn đăng xuất?")) {
+                localStorage.removeItem('jwt_token');
+                localStorage.removeItem('user_info');
+                window.location.href = '/index.html';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sửa hồ sơ - ExpensePro</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .form-group { margin-bottom: 24px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
+        .form-control { width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--bg-color); color: var(--text-main); font-size: 15px; outline: none; transition: 0.3s; }
+        .form-control:focus { border-color: var(--primary-color); background: var(--card-bg); box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1); }
+    </style>
+</head>
+<body onload="loadCurrentInfo()">
+    <div class="dashboard-layout">
+        
+        <aside class="sidebar">
+            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> <span>ExpensePro</span></div>
+            <nav class="sidebar-menu">
+                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> <span>Tổng quan</span></a>
+                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> <span>Ví của tôi</span></a>
+                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> <span>Thống kê</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/screens/settings.html" class="menu-item active"><i class="material-icons">settings</i> <span>Cài đặt</span></a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div onclick="window.location.href='/screens/settings.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'">
+                        <i class="material-icons">arrow_back</i>
+                    </div>
+                    <h1 class="page-title">Sửa thông tin cá nhân</h1>
+                </div>
+            </header>
+            
+            <div class="content-area" style="max-width: 600px;">
+                <div class="card" style="padding: 32px; border-radius: 20px;">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" id="prof-name" class="form-control" placeholder="Nhập họ tên của bạn">
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="text" id="prof-phone" class="form-control" placeholder="Nhập số điện thoại">
+                    </div>
+                    
+                    <div style="height: 1px; background: var(--border-color); margin: 32px 0;"></div>
+                    <h3 style="font-size: 16px; margin-bottom: 20px; color: var(--text-main);">Đổi mật khẩu (Bỏ trống nếu không đổi)</h3>
+                    
+                    <div class="form-group">
+                        <label>Mật khẩu hiện tại <span style="color: red;">*</span></label>
+                        <input type="password" id="prof-old-pw" class="form-control" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu mới</label>
+                        <input type="password" id="prof-new-pw" class="form-control" placeholder="••••••••">
+                    </div>
+
+                    <button class="btn-primary" style="width: 100%; justify-content: center; padding: 16px; margin-top: 16px; font-size: 16px;" onclick="updateProfile()">
+                        <i class="material-icons">save</i> LƯU THAY ĐỔI
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/account.js"></script>
+</body>
+</html>

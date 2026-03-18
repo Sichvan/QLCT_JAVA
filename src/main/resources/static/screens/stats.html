@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống kê - ExpensePro</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+</head>
+<body onload="initStatsPage();">
+    <div class="dashboard-layout">
+        
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class="material-icons">account_balance_wallet</i> ExpensePro
+            </div>
+            <nav class="sidebar-menu">
+                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
+                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
+                <a href="/screens/stats.html" class="menu-item active"><i class="material-icons">pie_chart</i> Thống kê</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h1 class="page-title">Thống kê</h1>
+                <div class="user-profile" onclick="window.location.href='/screens/settings.html'" style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                    <span id="header-user-name" style="font-weight: 600; color: var(--text-main); font-size: 15px;">Người dùng</span>
+                    <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; background-color: var(--primary-color); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; color: white; box-shadow: var(--shadow-sm);">
+                        <i class="material-icons" id="header-avatar-icon">person</i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <div style="display: flex; background: var(--border-color); border-radius: 14px; padding: 6px; margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                    <div class="tab-btn" id="tab-expense" onclick="loadStats('expense')" style="flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: var(--text-main);">Chi Tiêu</div>
+                    <div class="tab-btn" id="tab-income" onclick="loadStats('income')" style="flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: var(--text-main);">Thu Nhập</div>
+                </div>
+
+                <div class="card" style="height: 400px; display: flex; justify-content: center; align-items: center; position: relative; padding: 32px;">
+                    <canvas id="myChart"></canvas>
+                </div>
+
+                <h2 style="margin: 32px 0 16px; font-size: 20px; font-weight: 600; color: var(--text-main);">Chi tiết danh mục</h2>
+                <div class="card" id="stat-list" style="padding: 12px 24px;">
+                    <p style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải dữ liệu...</p>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="/screens/home.html" class="nav-item"><i class="material-icons">home</i><span>Trang chủ</span></a>
+            <a href="/screens/wallet.html" class="nav-item"><i class="material-icons">account_balance_wallet</i><span>Ví</span></a>
+            <a href="/screens/transaction_add.html" class="nav-item" style="position: relative;">
+                <div class="fab-mobile"><i class="material-icons" style="font-size: 28px;">add</i></div><span style="opacity: 0;">Add</span>
+            </a>
+            <a href="/screens/stats.html" class="nav-item active"><i class="material-icons">pie_chart</i><span>Thống kê</span></a>
+            <a href="/screens/settings.html" class="nav-item"><i class="material-icons">person</i><span>Cá nhân</span></a>
+        </nav>
+    </div>
+
+    <script src="/js/stats.js"></script>
+    <script>
+        function initStatsPage() {
+            if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+            const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+            document.getElementById('header-user-name').textContent = userInfo.fullName || userInfo.username || 'User';
+            
+            const savedAvatar = localStorage.getItem('user_avatar');
+            if (savedAvatar) {
+                const headAvt = document.getElementById('header-avatar');
+                headAvt.style.backgroundImage = `url("${savedAvatar}")`; // Fix bọc ngoặc kép cho an toàn
+                document.getElementById('header-avatar-icon').style.display = 'none';
+            }
+            loadStats('expense');
+        }
+    </script>
+</body>
+</html>

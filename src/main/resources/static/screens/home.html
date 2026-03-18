@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ - ExpensePro</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+    <style>
+        /* CSS cho Popup Sửa Giao Dịch */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: 0.3s; }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-content { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 24px; padding: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: 0.3s; }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;}
+        .form-control { width: 100%; padding: 14px 16px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 15px; outline: none; transition: 0.3s; background: var(--bg-color); color: var(--text-main);}
+        .form-control:focus { border-color: var(--primary-color); background: var(--card-bg); box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);}
+        .modal-actions { display: flex; gap: 12px; margin-top: 32px; }
+        .btn-cancel { flex: 1; padding: 14px; border-radius: 12px; border: none; background: #f1f5f9; color: var(--text-main); font-weight: 600; cursor: pointer; transition: 0.2s;}
+        .btn-submit { flex: 1; padding: 14px; border-radius: 12px; border: none; background: var(--warning-color); color: white; font-weight: 600; cursor: pointer; transition: 0.2s;}
+
+        /* CSS CHO THÔNG BÁO NỔI CẢNH BÁO NGÂN SÁCH Ở TRANG CHỦ */
+        .toast-notification {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+            font-weight: 600;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        @media (min-width: 769px) { .toast-notification { bottom: 40px; left: calc(50% + 130px); } }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        
+        <aside class="sidebar">
+            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> ExpensePro</div>
+            <nav class="sidebar-menu">
+                <a href="/screens/home.html" class="menu-item active"><i class="material-icons">dashboard</i> Tổng quan</a>
+                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
+                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
+            </nav>
+            <div class="sidebar-footer"><a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a></div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h1 class="page-title">Chào buổi sáng,</h1>
+                    <p id="header-user-name" style="color: var(--text-muted); font-size: 14px; font-weight: 500;">Đang tải...</p>
+                </div>
+                <div class="user-profile" onclick="window.location.href='/screens/settings.html'" style="cursor: pointer;">
+                    <div id="header-avatar" style="width: 48px; height: 48px; border-radius: 50%; background-color: var(--primary-color); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; color: white; box-shadow: var(--shadow-sm);">
+                        <i class="material-icons" id="header-avatar-icon" style="font-size: 24px;">person</i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <div class="grid-cards">
+                    <div class="card gradient-card">
+                        <div class="stat-label">Tổng Tài Sản Hiện Có</div>
+                        <div class="stat-value" id="total-balance">0 ₫</div>
+                        <div class="flex-between" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 16px; margin-top: 12px;">
+                            <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Cập nhật: <b id="current-date">Hôm nay</b></span>
+                            <i class="material-icons" style="opacity: 0.9;">account_balance_wallet</i>
+                        </div>
+                    </div>
+
+                    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 24px;">
+                        <div class="flex-between" style="margin-bottom: 16px;">
+                            <div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Thu nhập tháng</div>
+                                <div class="text-success" id="month-income" style="font-size: 26px; font-weight: 700;">0 ₫</div>
+                            </div>
+                            <div style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                <i class="material-icons" style="color: var(--success-color);">trending_up</i>
+                            </div>
+                        </div>
+                        <div style="height: 1px; background: var(--border-color); margin: 12px 0;"></div>
+                        <div class="flex-between">
+                            <div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Chi tiêu tháng</div>
+                                <div class="text-danger" id="month-expense" style="font-size: 26px; font-weight: 700;">0 ₫</div>
+                            </div>
+                            <div style="width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
+                                <i class="material-icons" style="color: var(--danger-color);">trending_down</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-between" style="margin-bottom: 20px; margin-top: 12px;">
+                    <h2 style="font-size: 20px; font-weight: 600; color: var(--text-main);">Giao dịch gần đây</h2>
+                    <button class="btn-primary" onclick="window.location.href='/screens/transaction_add.html'"><i class="material-icons">add</i> Ghi chép</button>
+                </div>
+
+                <div class="card" id="tx-list" style="padding: 12px 24px;">
+                    <p class="text-center" style="color: var(--text-muted); padding: 40px 0;">
+                        <i class="material-icons" style="font-size: 48px; opacity: 0.3; display: block; margin-bottom: 12px;">history</i>
+                        Đang tải dữ liệu...
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="/screens/home.html" class="nav-item active"><i class="material-icons">home</i><span>Trang chủ</span></a>
+            <a href="/screens/wallet.html" class="nav-item"><i class="material-icons">account_balance_wallet</i><span>Ví</span></a>
+            <a href="/screens/transaction_add.html" class="nav-item" style="position: relative;">
+                <div class="fab-mobile"><i class="material-icons" style="font-size: 28px;">add</i></div><span style="opacity: 0;">Add</span>
+            </a>
+            <a href="/screens/stats.html" class="nav-item"><i class="material-icons">pie_chart</i><span>Thống kê</span></a>
+            <a href="/screens/settings.html" class="nav-item"><i class="material-icons">person</i><span>Cá nhân</span></a>
+        </nav>
+    </div>
+
+    <div id="toast-notification" class="toast-notification">
+        <i class="material-icons" style="font-size: 20px;">error_outline</i>
+        <span>Cảnh báo: Chi tiêu tháng này đã vượt ngân sách!</span>
+    </div>
+
+    <div class="modal-overlay" id="editTxModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 24px; font-size: 20px;">Sửa giao dịch</h2>
+            <input type="hidden" id="edit-tx-id"><input type="hidden" id="edit-tx-type">
+            <div class="form-group">
+                <label>Số tiền (VNĐ)</label>
+                <input type="tel" id="edit-tx-amount" class="form-control" style="font-size: 20px; font-weight: bold; color: var(--primary-color);" onfocus="unformatCurrency(this)" onblur="formatCurrency(this)" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Danh mục</label>
+                <select id="edit-tx-category" class="form-control"></select>
+            </div>
+            <div class="form-group">
+                <label>Ngày giao dịch</label>
+                <input type="date" id="edit-tx-date" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Ghi chú</label>
+                <input type="text" id="edit-tx-note" class="form-control" autocomplete="off">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeEditModal()">HỦY</button>
+                <button class="btn-submit" onclick="submitEditTx()"><i class="material-icons" style="font-size: 18px; vertical-align: middle;">save</i> CẬP NHẬT</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/home.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const uiInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+            document.getElementById('header-user-name').textContent = uiInfo.fullName || uiInfo.username || 'Người dùng';
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('vi-VN');
+            
+            const savedAvatar = localStorage.getItem('user_avatar');
+            if (savedAvatar) {
+                const headAvt = document.getElementById('header-avatar');
+                headAvt.style.backgroundImage = `url("${savedAvatar}")`;
+                document.getElementById('header-avatar-icon').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
