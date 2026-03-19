@@ -10,6 +10,8 @@ import web.expense_management.dtos.RegisterRequest;
 import web.expense_management.models.User;
 import web.expense_management.repositories.UserRepository;
 import web.expense_management.security.JwtUtils;
+import web.expense_management.services.EmailService;
+import web.expense_management.services.OtpService;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -19,15 +21,17 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private JwtUtils jwtUtils; 
+    @Autowired private EmailService emailService;
+    @Autowired private OtpService otpService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    // ==========================================
+    // TÍNH NĂNG ĐĂNG KÝ MỚI (CHỜ XÁC NHẬN OTP)
+    // ==========================================
 
-    @Autowired
-    private JwtUtils jwtUtils; // Gọi công cụ sinh Token vào đây
-
+    // Bước 1: Người dùng gửi thông tin -> Hệ thống cất tạm & gửi OTP
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         if (request.getUsername() == null || request.getPassword() == null) {
@@ -38,38 +42,117 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("message", "Email này đã được sử dụng"));
         }
 
+        // Lưu tạm thông tin vào RAM, CHƯA LƯU XUỐNG MONGODB
+        String email = request.getUsername().toLowerCase().trim();
+        otpService.savePendingUser(email, request);
+
+        // Sinh OTP và Gửi Mail
+        String otp = otpService.generateOtp(email);
+        String subject = "Mã xác nhận đăng ký tài khoản ExpensePro";
+        String body = "Xin chào " + request.getFullName() + ",\n\n"
+                    + "Mã OTP xác nhận đăng ký tài khoản của bạn là: " + otp + "\n"
+                    + "Mã này sẽ hết hạn sau 5 phút.\n\n"
+                    + "Trân trọng,\nĐội ngũ ExpensePro";
+        
+        emailService.sendEmail(email, subject, body);
+
+        return ResponseEntity.ok(Map.of("message", "Mã OTP đã được gửi. Vui lòng kiểm tra email của bạn."));
+    }
+
+    // Bước 2: Người dùng nhập OTP -> Hệ thống kiểm tra & Lưu chính thức
+    @PostMapping("/verify-register")
+    public ResponseEntity<?> verifyRegister(@RequestBody Map<String, String> request) {
+        String email = request.get("email").toLowerCase().trim();
+        String otp = request.get("otp");
+
+        // 1. Kiểm tra OTP có đúng không
+        if (!otpService.validateOtp(email, otp)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Mã OTP không hợp lệ hoặc đã hết hạn"));
+        }
+
+        // 2. Lấy thông tin đăng ký đang lưu tạm ra
+        RegisterRequest pendingUser = otpService.getPendingUser(email);
+        if (pendingUser == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Không tìm thấy phiên đăng ký, vui lòng đăng ký lại"));
+        }
+
+        // 3. Chính thức lưu User xuống Database
         User newUser = new User();
-        newUser.setUsername(request.getUsername().toLowerCase().trim());
-        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
-        newUser.setFullName(request.getFullName().trim());
-        newUser.setPhone(request.getPhone());
+        newUser.setUsername(pendingUser.getUsername().toLowerCase().trim());
+        newUser.setPassword(passwordEncoder.encode(pendingUser.getPassword()));
+        newUser.setFullName(pendingUser.getFullName().trim());
+        newUser.setPhone(pendingUser.getPhone());
         newUser.setRole("user");
         newUser.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(newUser);
+        otpService.removePendingUser(email); // Xóa thông tin tạm đi cho sạch RAM
 
-        // Sinh Token ngay sau khi lưu user
+        // 4. Sinh Token và tự động cho người dùng đăng nhập luôn
         String token = jwtUtils.generateToken(newUser);
-
-        // Trả về đúng chuẩn App Flutter cần
         return ResponseEntity.status(201).body(new AuthResponse(newUser, token));
     }
 
+
+    // ==========================================
+    // TÍNH NĂNG ĐĂNG NHẬP
+    // ==========================================
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername().toLowerCase().trim());
-
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                // Đăng nhập đúng pass -> Sinh Token
                 String token = jwtUtils.generateToken(user);
-                
-                // Trả về đúng chuẩn
                 return ResponseEntity.ok(new AuthResponse(user, token));
             }
         }
-        
         return ResponseEntity.status(401).body(Map.of("message", "Email hoặc mật khẩu không chính xác"));
+    }
+
+
+    // ==========================================
+    // TÍNH NĂNG QUÊN MẬT KHẨU
+    // ==========================================
+
+    // Bước 1: Nhập email -> Nhận OTP
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        if (email == null || !userRepository.existsByUsername(email)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email không tồn tại trong hệ thống"));
+        }
+
+        String otp = otpService.generateOtp(email);
+        String body = "Bạn đã yêu cầu khôi phục mật khẩu.\n\n"
+                    + "Mã OTP của bạn là: " + otp + "\n"
+                    + "Vui lòng nhập mã này vào ứng dụng để đặt lại mật khẩu mới (Mã có hiệu lực trong 5 phút).\n\n"
+                    + "Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.";
+        
+        emailService.sendEmail(email, "Khôi phục mật khẩu ExpensePro", body);
+        return ResponseEntity.ok(Map.of("message", "Đã gửi mã OTP khôi phục về email của bạn."));
+    }
+
+    // Bước 2: Nhập OTP và Mật khẩu mới
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String otp = request.get("otp");
+        String newPassword = request.get("newPassword");
+
+        if (!otpService.validateOtp(email, otp)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Mã OTP không hợp lệ hoặc đã hết hạn"));
+        }
+
+        if (newPassword == null || !newPassword.matches("^(?=.*[A-Za-z])(?=.*\\d).{6,}$")) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Mật khẩu mới phải có ít nhất 6 ký tự, bao gồm chữ và số"));
+        }
+
+        // Tìm User và đổi mật khẩu
+        User user = userRepository.findByUsername(email).orElseThrow();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("message", "Đổi mật khẩu thành công. Vui lòng đăng nhập lại."));
     }
 }

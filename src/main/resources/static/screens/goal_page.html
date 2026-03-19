@@ -6,6 +6,7 @@
     <title>Mục Tiêu - ExpensePro</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
     <style>
         .progress-bar { width: 100%; height: 10px; background: var(--border-color); border-radius: 8px; margin: 16px 0 12px 0; overflow: hidden; }
         .progress-fill { height: 100%; border-radius: 8px; transition: 0.4s ease; }
@@ -64,7 +65,7 @@
             </div>
             <div class="form-group">
                 <label>Số tiền cần đạt (VNĐ)</label>
-                <input type="tel" id="goal-target" class="form-control" placeholder="VD: 50.000.000" style="font-size: 20px; font-weight: bold; color: var(--primary-color);" autocomplete="off">
+                <input type="tel" id="goal-target" class="form-control" placeholder="VD: 50.000.000" style="font-size: 20px; font-weight: bold; color: var(--primary-color);" onfocus="unformatCurrency(this)" onblur="formatCurrency(this)" autocomplete="off">
             </div>
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeAddModal()">HỦY</button>
@@ -76,11 +77,13 @@
     <div class="modal-overlay" id="depositModal">
         <div class="modal-content">
             <h2 style="margin-bottom: 12px; font-size: 20px;">Nạp tiền tiết kiệm</h2>
-            <p id="deposit-goal-name" style="color: var(--text-muted); margin-bottom: 24px;"></p>
+            <p id="deposit-goal-name" style="color: var(--text-main); font-weight: 600; margin-bottom: 4px;"></p>
+            <p id="deposit-goal-remaining-text" style="color: var(--text-muted); font-size: 13px; margin-bottom: 24px;"></p>
+            
             <input type="hidden" id="deposit-goal-id">
-            <div class="form-group">
+            <input type="hidden" id="deposit-goal-remaining"> <div class="form-group">
                 <label>Số tiền nạp (VNĐ)</label>
-                <input type="tel" id="deposit-amount" class="form-control" placeholder="VD: 500.000" style="font-size: 24px; font-weight: bold; color: var(--success-color);" autocomplete="off">
+                <input type="tel" id="deposit-amount" class="form-control" placeholder="VD: 500.000" style="font-size: 24px; font-weight: bold; color: var(--success-color);" onfocus="unformatCurrency(this)" onblur="formatCurrency(this)" autocomplete="off">
             </div>
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeDepositModal()">HỦY</button>
@@ -90,8 +93,6 @@
     </div>
 
     <script>
-        if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-
         const token = localStorage.getItem('jwt_token');
         if (!token) window.location.href = '/index.html';
 
@@ -115,14 +116,20 @@
             }
         }
 
-        // Kích hoạt cho 2 ô nhập tiền
-        setupCurrencyInput('goal-target');
-        setupCurrencyInput('deposit-amount');
-
+        // Chống lỗi gõ tiếng Việt / Unikey
+        function unformatCurrency(input) { if (input.value) input.value = input.value.replace(/\./g, ''); }
+        function formatCurrency(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (val) input.value = parseInt(val, 10).toLocaleString('vi-VN');
+            else input.value = '';
+        }
         function getRawNumber(formattedStr) {
             if (!formattedStr) return 0;
             return parseInt(formattedStr.toString().replace(/\D/g, ''), 10) || 0;
         }
+
+        setupCurrencyInput('goal-target');
+        setupCurrencyInput('deposit-amount');
 
         const formatCurrencyText = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 
@@ -140,10 +147,11 @@
                 listDiv.innerHTML = goals.map(goal => {
                     let percent = (goal.currentAmount / goal.targetAmount) * 100;
                     if (percent > 100) percent = 100;
+                    
                     const safeName = goal.name.replace(/'/g, "\\'");
 
                     return `
-                        <div class="card" style="cursor: pointer; transition: 0.2s;" onclick="openDepositModal('${goal.id}', '${safeName}')">
+                        <div class="card" style="cursor: pointer; transition: 0.2s;" onclick="openDepositModal('${goal.id}', '${safeName}', ${goal.currentAmount}, ${goal.targetAmount})">
                             <div style="display: flex; align-items: center;">
                                 <div style="background: rgba(67, 97, 238, 0.1); padding: 12px; border-radius: 50%; margin-right: 16px; display: flex; justify-content: center; align-items: center;">
                                     <i class="material-icons" style="color: var(--primary-color);">savings</i>
@@ -159,7 +167,7 @@
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 13px;">
                                 <span class="bold" style="color: var(--primary-color);">${formatCurrencyText(goal.currentAmount)}</span>
-                                <span style="color: var(--text-muted); font-weight: 500;">Mục: ${formatCurrencyText(goal.targetAmount)}</span>
+                                <span style="color: var(--text-muted); font-weight: 500;">Mục tiêu: ${formatCurrencyText(goal.targetAmount)}</span>
                             </div>
                         </div>
                     `;
@@ -194,17 +202,36 @@
             fetchGoals();
         }
 
-        function openDepositModal(id, name) {
+        // TRUYỀN THÊM TIỀN HIỆN TẠI VÀ TIỀN MỤC TIÊU VÀO MODAL
+        function openDepositModal(id, name, currentAmount, targetAmount) {
+            const remaining = targetAmount - currentAmount;
+            
             document.getElementById('deposit-goal-id').value = id;
-            document.getElementById('deposit-goal-name').textContent = "Nạp cho: " + name;
+            document.getElementById('deposit-goal-remaining').value = remaining;
+            
+            document.getElementById('deposit-goal-name').textContent = "Mục tiêu: " + name;
+            document.getElementById('deposit-goal-remaining-text').textContent = "Số tiền còn thiếu: " + formatCurrencyText(remaining);
+            
             document.getElementById('depositModal').classList.add('active');
         }
-        function closeDepositModal() { document.getElementById('depositModal').classList.remove('active'); document.getElementById('deposit-amount').value = ''; }
+
+        function closeDepositModal() { 
+            document.getElementById('depositModal').classList.remove('active'); 
+            document.getElementById('deposit-amount').value = ''; 
+        }
 
         async function submitDeposit() {
             const id = document.getElementById('deposit-goal-id').value;
-            const amount = getRawNumber(document.getElementById('deposit-amount').value);
+            let amount = getRawNumber(document.getElementById('deposit-amount').value);
+            const remaining = parseFloat(document.getElementById('deposit-goal-remaining').value);
+
             if (amount <= 0) return alert("Số tiền nạp không hợp lệ!");
+
+            // XỬ LÝ LOGIC NẾU NHẬP LỐ TIỀN THÌ CHỈ LẤY PHẦN CÒN THIẾU
+            if (amount > remaining) {
+                alert(`Bạn nhập dư tiền!\nHệ thống sẽ chỉ trích đúng ${formatCurrencyText(remaining)} để hoàn thành mục tiêu này.`);
+                amount = remaining; // Cắt giảm số tiền bằng với số còn thiếu
+            }
 
             try {
                 const res = await fetch(`/api/goals/${id}/deposit`, {
@@ -217,7 +244,7 @@
                 if (res.ok) {
                     closeDepositModal();
                     if (data.isSuccess) {
-                        alert("🎉 CHÚC MỪNG! Bạn đã tiết kiệm đủ tiền. Mục tiêu này sẽ biến mất khỏi danh sách.");
+                        alert("🎉 CHÚC MỪNG BẠN! 🎉\nBạn đã tiết kiệm đủ tiền. Mục tiêu này đã hoàn thành và sẽ được gỡ khỏi danh sách.");
                         await fetch(`/api/goals/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
                     } else {
                         alert("Nạp tiền thành công!");

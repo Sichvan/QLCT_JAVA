@@ -2,10 +2,10 @@ package web.expense_management.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import lombok.Data;
+
 import java.time.LocalDateTime;
 
-@Data
+
 @Document(collection = "budgets")
 public class Budget {
     @Id
@@ -18,4 +18,46 @@ public class Budget {
     
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public String getUser() {
+        return user;
+    }
+    public void setUser(String user) {
+        this.user = user;
+    }
+    public String getCategory() {
+        return category;
+    }
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    public String getCategoryName() {
+        return categoryName;
+    }
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+    public double getLimitAmount() {
+        return limitAmount;
+    }
+    public void setLimitAmount(double limitAmount) {
+        this.limitAmount = limitAmount;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

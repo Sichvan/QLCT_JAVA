@@ -8,14 +8,17 @@ import org.springframework.web.bind.annotation.*;
 import web.expense_management.dtos.TransactionDTO;
 import web.expense_management.dtos.TransactionRequest;
 import web.expense_management.dtos.WalletResponse;
+import web.expense_management.models.Budget;
 import web.expense_management.models.Expense;
 import web.expense_management.models.Income;
 import web.expense_management.models.Loan;
 import web.expense_management.models.User;
+import web.expense_management.repositories.BudgetRepository;
 import web.expense_management.repositories.ExpenseRepository;
 import web.expense_management.repositories.IncomeRepository;
 import web.expense_management.repositories.LoanRepository;
 import web.expense_management.repositories.UserRepository;
+import web.expense_management.services.EmailService;
 
 import java.util.*;
 
@@ -27,6 +30,8 @@ public class TransactionController {
     @Autowired private IncomeRepository incomeRepository;
     @Autowired private LoanRepository loanRepository;
     @Autowired private UserRepository userRepository;
+    @Autowired private BudgetRepository budgetRepository;
+    @Autowired private EmailService emailService;
 
     // --- HÀM HỖ TRỢ: LẤY ID USER ĐANG ĐĂNG NHẬP ---
     private String getCurrentUserId() {
@@ -62,6 +67,33 @@ public class TransactionController {
                 expense.setDate(transDate);
                 newTransaction = expenseRepository.save(expense);
                 user.setBalance(user.getBalance() - amount);
+
+                // --- LOGIC CẢNH BÁO QUÁ NGÂN SÁCH ---
+                Optional<Budget> budgetOpt = budgetRepository.findByUserAndCategory(userId, request.getCategory());
+                if (budgetOpt.isPresent()) {
+                    Budget budget = budgetOpt.get();
+                    
+                    // Lấy ngày đầu tháng và cuối tháng hiện tại
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.DAY_OF_MONTH, 1);
+                    Date startOfMonth = cal.getTime();
+                    cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+                    Date endOfMonth = cal.getTime();
+
+                    // Tính tổng đã tiêu trong tháng này cho danh mục này
+                    List<Expense> monthlyExpenses = expenseRepository.findByUserAndCategoryAndDateBetween(userId, request.getCategory(), startOfMonth, endOfMonth);
+                    double totalSpent = monthlyExpenses.stream().mapToDouble(Expense::getAmount).sum();
+
+                    // Nếu vượt ngân sách -> Gửi mail
+                    if (totalSpent > budget.getLimitAmount()) {
+                        String subject = "⚠️ CẢNH BÁO QUÁ NGÂN SÁCH - " + budget.getCategoryName();
+                        String body = "Chào " + user.getFullName() + ",\n\n"
+                                    + "Bạn vừa chi tiêu thêm " + String.format("%,.0f", request.getAmount()) + " đ vào danh mục " + budget.getCategoryName() + ".\n"
+                                    + "Hiện tại bạn đã chi tổng cộng: " + String.format("%,.0f", totalSpent) + " đ, vượt quá ngân sách cho phép (" + String.format("%,.0f", budget.getLimitAmount()) + " đ).\n\n"
+                                    + "Hãy chú ý cân nhắc và điều chỉnh việc chi tiêu nhé!\n\nTrân trọng,\nĐội ngũ ExpensePro.";
+                        emailService.sendEmail(user.getUsername(), subject, body);
+                    }
+                }
                 break;
 
             case "income":
