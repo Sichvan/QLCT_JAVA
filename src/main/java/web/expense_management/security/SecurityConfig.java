@@ -31,6 +31,7 @@ public class SecurityConfig {
                 // THÊM DÒNG NÀY: Mở cửa cho toàn bộ file giao diện HTML, CSS, JS
                 // SỬA LẠI DÒNG NÀY TRONG FILE SecurityConfig.java
                 .requestMatchers("/", "/index.html", "/*.html", "/css/**", "/js/**", "/assets/**", "/screens/**").permitAll()
+                .requestMatchers("/api/chat").authenticated()
                 .anyRequest().authenticated() 
             );
             

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trợ lý AI - ExpensePro</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+    <style>
+        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 120px); background: var(--card-bg); border-radius: 20px; box-shadow: var(--shadow-sm); overflow: hidden; border: 1px solid var(--border-color); }
+        .chat-header { padding: 16px 24px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; display: flex; align-items: center; gap: 12px; }
+        .chat-body { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: var(--bg-color); scroll-behavior: smooth; }
+        
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 15px; line-height: 1.5; position: relative; animation: fadeIn 0.3s ease; }
+        .msg-ai { align-self: flex-start; background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); border-bottom-left-radius: 4px; }
+        .msg-user { align-self: flex-end; background: var(--primary-color); color: white; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2); }
+        
+        .chat-input-area { padding: 16px; background: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; gap: 12px; align-items: center; }
+        .chat-input { flex: 1; padding: 14px 20px; border: 1px solid var(--border-color); border-radius: 30px; font-size: 15px; outline: none; background: var(--bg-color); color: var(--text-main); transition: 0.3s; }
+        .chat-input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1); }
+        .btn-send { width: 48px; height: 48px; border-radius: 50%; background: var(--primary-color); color: white; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2); }
+        .btn-send:hover { transform: scale(1.05); }
+        .btn-send:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .typing-indicator { display: flex; gap: 4px; padding: 8px 12px; }
+        .dot { width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .dot:nth-child(1) { animation-delay: -0.32s; } .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> ExpensePro</div>
+            <nav class="sidebar-menu" id="sidebar-nav">
+                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
+                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
+                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
+                <a href="/screens/chat.html" class="menu-item active"><i class="material-icons">smart_toy</i> Trợ lý AI</a>
+            </nav>
+            <div class="sidebar-footer"><a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a></div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-area">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div style="width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
+                            <i class="material-icons" style="color: var(--primary-color);">smart_toy</i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 16px;">Sichvan AI</div>
+                            <div style="font-size: 12px; opacity: 0.8;">Đang hoạt động - Sẵn sàng tư vấn</div>
+                        </div>
+
+                        <div style="cursor: pointer; padding: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); margin-left: 12px;" onclick="clearChat()" title="Xóa cuộc trò chuyện">
+                            <i class="material-icons" style="font-size: 20px;">delete_sweep</i>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-body" id="chat-box">
+                        </div>
+
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" class="chat-input" placeholder="Hỏi AI bất cứ điều gì về tài chính..." onkeypress="handleKeyPress(event)">
+                        <button class="btn-send" id="btn-send" onclick="sendMessage()"><i class="material-icons">send</i></button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+      if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+        const token = localStorage.getItem('jwt_token');
+        if (!token) window.location.href = '/index.html';
+
+        const chatBox = document.getElementById('chat-box');
+        const inputField = document.getElementById('chat-input');
+        const btnSend = document.getElementById('btn-send');
+
+        function loadChatHistory() {
+            const history = localStorage.getItem('chat_history');
+            if (history) {
+                chatBox.innerHTML = history;
+            } else {
+                chatBox.innerHTML = `
+                    <div class="msg msg-ai">
+                        Xin chào! Mình là Sichvan - Trợ lý tài chính thông minh của bạn. Mình đã nắm được số dư hiện tại của bạn. Bạn muốn mình tư vấn cách tiết kiệm, hay lập kế hoạch chi tiêu tháng này?
+                    </div>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function saveChatHistory() {
+            localStorage.setItem('chat_history', chatBox.innerHTML);
+        }
+
+        loadChatHistory();
+
+        function clearChat() {
+            if(confirm("Bạn có chắc muốn xóa toàn bộ đoạn hội thoại này?")) {
+                localStorage.removeItem('chat_history');
+                loadChatHistory();
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        async function sendMessage() {
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            chatBox.innerHTML += `<div class="msg msg-user">${text}</div>`;
+            saveChatHistory();
+            
+            inputField.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const typingId = 'typing-' + Date.now();
+            chatBox.innerHTML += `
+                <div class="msg msg-ai" id="${typingId}">
+                    <div class="typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                </div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+            btnSend.disabled = true;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text }) // Đã bỏ phần gửi modelType
+                });
+
+                const data = await res.json();
+                
+                const typingEl = document.getElementById(typingId);
+                if(typingEl) typingEl.remove();
+
+                const formattedReply = data.reply.replace(/\n/g, '<br>');
+                chatBox.innerHTML += `<div class="msg msg-ai">${formattedReply}</div>`;
+                
+                saveChatHistory();
+
+            } catch (err) {
+                const typingEl = document.getElementById(typingId);
+                if(typingEl) typingEl.remove();
+                
+                chatBox.innerHTML += `<div class="msg msg-ai" style="color: var(--danger-color); font-weight: bold;">⚠️ Xin lỗi, hiện tại máy chủ AI đang bận. Vui lòng thử lại sau!</div>`;
+            } finally {
+                btnSend.disabled = false;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                inputField.focus();
+            }
+        }
+</script>
+</body>
+</html>

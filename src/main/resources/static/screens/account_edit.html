@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sửa hồ sơ - ExpensePro</title>
+    <title>Sửa hồ sơ - QLCT_HK</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -17,11 +17,12 @@
     <div class="dashboard-layout">
         
         <aside class="sidebar">
-            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> <span>ExpensePro</span></div>
+            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> <span>QLCT_HK</span></div>
             <nav class="sidebar-menu">
                 <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> <span>Tổng quan</span></a>
                 <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> <span>Ví của tôi</span></a>
                 <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> <span>Thống kê</span></a>
+                <a href="/screens/chat.html" class="menu-item"><i class="material-icons">smart_toy</i> Trợ lý AI</a>
             </nav>
             <div class="sidebar-footer">
                 <a href="/screens/settings.html" class="menu-item active"><i class="material-icons">settings</i> <span>Cài đặt</span></a>
@@ -70,5 +71,8 @@
     </div>
 
     <script src="/js/account.js"></script>
+    <script>
+        if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+    </script>
 </body>
 </html>
