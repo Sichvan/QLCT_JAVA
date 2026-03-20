@@ -11,9 +11,18 @@
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;}
         .form-control { width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid var(--border-color); background: var(--bg-color); color: var(--text-main); font-size: 15px; outline: none; transition: 0.3s; }
         .form-control:focus { border-color: var(--primary-color); background: var(--card-bg); box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1); }
+        
+        /* CSS cho thẻ bọc Mật khẩu và Con mắt */
+        .password-wrapper { position: relative; display: flex; align-items: center; }
+        .password-wrapper input { padding-right: 48px; } /* Chừa chỗ cho con mắt bên phải */
+        .password-wrapper .toggle-pw-icon { 
+            position: absolute; right: 16px; color: var(--text-muted); 
+            cursor: pointer; user-select: none; transition: 0.2s;
+        }
+        .password-wrapper .toggle-pw-icon:hover { color: var(--primary-color); }
     </style>
 </head>
-<body onload="loadCurrentInfo()">
+<body>
     <div class="dashboard-layout">
         
         <aside class="sidebar">
@@ -55,11 +64,17 @@
                     
                     <div class="form-group">
                         <label>Mật khẩu hiện tại <span style="color: red;">*</span></label>
-                        <input type="password" id="prof-old-pw" class="form-control" placeholder="••••••••">
+                        <div class="password-wrapper">
+                            <input type="password" id="prof-old-pw" class="form-control" placeholder="••••••••">
+                            <i class="material-icons toggle-pw-icon" onclick="togglePassword('prof-old-pw', this)">visibility_off</i>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Mật khẩu mới</label>
-                        <input type="password" id="prof-new-pw" class="form-control" placeholder="••••••••">
+                        <div class="password-wrapper">
+                            <input type="password" id="prof-new-pw" class="form-control" placeholder="••••••••">
+                            <i class="material-icons toggle-pw-icon" onclick="togglePassword('prof-new-pw', this)">visibility_off</i>
+                        </div>
                     </div>
 
                     <button class="btn-primary" style="width: 100%; justify-content: center; padding: 16px; margin-top: 16px; font-size: 16px;" onclick="updateProfile()">
@@ -71,8 +86,28 @@
     </div>
 
     <script src="/js/account.js"></script>
+    
     <script>
         if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+
+        // Hàm Đổ dữ liệu ra form (Chuyển từ onload xuống đây để chạy ổn định hơn)
+        document.addEventListener("DOMContentLoaded", function() {
+            const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+            if (document.getElementById('prof-name')) document.getElementById('prof-name').value = userInfo.fullName || '';
+            if (document.getElementById('prof-phone')) document.getElementById('prof-phone').value = userInfo.phone || '';
+        });
+
+        // HÀM XỬ LÝ ẨN/HIỆN MẬT KHẨU
+        function togglePassword(inputId, iconEl) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                iconEl.textContent = "visibility"; // Đổi thành icon mắt mở
+            } else {
+                input.type = "password";
+                iconEl.textContent = "visibility_off"; // Đổi thành icon mắt nhắm
+            }
+        }
     </script>
 </body>
 </html>

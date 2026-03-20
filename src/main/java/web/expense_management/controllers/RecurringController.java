@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import web.expense_management.models.Recurring;
 import web.expense_management.models.User;
 import web.expense_management.repositories.RecurringRepository;
+import web.expense_management.services.SchedulerService;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,9 @@ import java.util.Map;
 public class RecurringController {
 
     @Autowired private RecurringRepository recurringRepository;
+    
+    // Tiêm SchedulerService vào để gọi hàm test
+    @Autowired private SchedulerService schedulerService;
 
     private String getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -57,5 +61,12 @@ public class RecurringController {
             recurringRepository.delete(recurring);
         }
         return ResponseEntity.ok(Map.of("message", "Đã xóa"));
+    }
+
+    // NÚT BẤM BÍ MẬT DÀNH CHO DEV ĐỂ TEST CHỨC NĂNG ĐỊNH KỲ
+    @GetMapping("/test-run")
+    public ResponseEntity<?> testRunScheduler() {
+        schedulerService.runDailyRecurringTasks();
+        return ResponseEntity.ok(Map.of("message", "Đã chạy thử quét giao dịch định kỳ thành công! Hãy check lại ví."));
     }
 }
