@@ -36,9 +36,7 @@
         <main class="main-content">
             <header class="topbar">
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <div onclick="window.location.href='/screens/wallet.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'">
-                        <i class="material-icons">arrow_back</i>
-                    </div>
+                    <div onclick="window.location.href='/screens/wallet.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'"><i class="material-icons">arrow_back</i></div>
                     <h1 class="page-title">Lịch tự động</h1>
                 </div>
             </header>
@@ -55,8 +53,8 @@
 
     <div class="modal-overlay" id="recurringModal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 24px; font-size: 20px;">Tạo lịch tự động</h2>
-            
+            <h2 style="margin-bottom: 24px; font-size: 20px;">Tạo/Sửa lịch tự động</h2>
+            <input type="hidden" id="rec-id">
             <div style="display: flex; gap: 12px;">
                 <div class="form-group" style="flex: 1;">
                     <label>Loại</label>
@@ -70,7 +68,6 @@
                     <input type="number" id="rec-day" class="form-control" placeholder="VD: 15" min="1" max="31">
                 </div>
             </div>
-
             <div class="form-group">
                 <label>Số tiền (VNĐ)</label>
                 <input type="tel" id="rec-amount" class="form-control" placeholder="VD: 1.500.000" style="font-size: 20px; font-weight: bold; color: var(--primary-color);" autocomplete="off">
@@ -79,7 +76,6 @@
                 <label>Ghi chú (Tên giao dịch)</label>
                 <input type="text" id="rec-note" class="form-control" placeholder="VD: Đóng tiền trọ">
             </div>
-
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModal()">HỦY</button>
                 <button class="btn-submit" onclick="submitRecurring()">LƯU LỊCH</button>
@@ -89,7 +85,6 @@
 
     <script>
         if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-
         const token = localStorage.getItem('jwt_token');
         if (!token) window.location.href = '/index.html';
 
@@ -138,6 +133,7 @@
                     const color = isExpense ? 'var(--danger-color)' : 'var(--success-color)';
                     const bgIcon = isExpense ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)';
                     const sign = isExpense ? '-' : '+';
+                    const safeNote = item.note ? item.note.replace(/'/g, "\\'") : '';
 
                     return `
                         <div class="card" style="display: flex; align-items: center; padding: 20px;">
@@ -148,8 +144,9 @@
                                 <div class="bold" style="font-size: 16px; color: var(--text-main);">${item.note || 'Giao dịch tự động'}</div>
                                 <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 500;">Tự động trừ vào ngày ${item.dayOfMonth} hàng tháng</div>
                             </div>
-                            <div style="text-align: right; display: flex; align-items: center; gap: 16px;">
-                                <div class="bold" style="color: ${color}; font-size: 18px;">${sign}${formatCurrencyText(item.amount)}</div>
+                            <div style="text-align: right; display: flex; align-items: center; gap: 12px;">
+                                <div class="bold" style="color: ${color}; font-size: 18px; margin-right: 8px;">${sign}${formatCurrencyText(item.amount)}</div>
+                                <i class="material-icons" style="color: var(--primary-color); cursor: pointer; padding: 8px; background: rgba(67, 97, 238, 0.1); border-radius: 8px;" onclick="editRecurring('${item.id}', '${item.type}', ${item.amount}, ${item.dayOfMonth}, '${safeNote}')">edit</i>
                                 <i class="material-icons" style="color: var(--danger-color); cursor: pointer; padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 8px;" onclick="deleteRecurring('${item.id}')">delete</i>
                             </div>
                         </div>
@@ -166,9 +163,27 @@
         }
 
         function openModal() { document.getElementById('recurringModal').classList.add('active'); }
-        function closeModal() { document.getElementById('recurringModal').classList.remove('active'); document.getElementById('rec-amount').value = ''; document.getElementById('rec-day').value = ''; document.getElementById('rec-note').value = ''; }
+        
+        // HÀM SỬA ĐỊNH KỲ
+        function editRecurring(id, type, amount, day, note) {
+            document.getElementById('rec-id').value = id;
+            document.getElementById('rec-type').value = type;
+            document.getElementById('rec-amount').value = amount.toLocaleString('vi-VN');
+            document.getElementById('rec-day').value = day;
+            document.getElementById('rec-note').value = note;
+            document.getElementById('recurringModal').classList.add('active');
+        }
+
+        function closeModal() { 
+            document.getElementById('recurringModal').classList.remove('active'); 
+            document.getElementById('rec-id').value = ''; 
+            document.getElementById('rec-amount').value = ''; 
+            document.getElementById('rec-day').value = ''; 
+            document.getElementById('rec-note').value = ''; 
+        }
         
         async function submitRecurring() {
+            const id = document.getElementById('rec-id').value;
             const type = document.getElementById('rec-type').value;
             const amount = getRawNumber(document.getElementById('rec-amount').value);
             const day = document.getElementById('rec-day').value;
@@ -177,12 +192,14 @@
             if (amount <= 0) return alert("Số tiền không hợp lệ!");
             if (!day || day < 1 || day > 31) return alert("Ngày trong tháng phải từ 1 đến 31!");
 
+            const payload = { type: type, amount: amount, dayOfMonth: parseInt(day), category: 'other_expense', categoryName: 'Định kỳ', note: note };
+
             try {
-                await fetch('/api/recurring', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: type, amount: amount, dayOfMonth: parseInt(day), category: 'other_expense', categoryName: 'Định kỳ', note: note })
-                });
+                if (id) {
+                    await fetch(`/api/recurring/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                } else {
+                    await fetch('/api/recurring', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                }
                 closeModal();
                 fetchRecurring();
             } catch (e) { alert("Lỗi kết nối!"); }

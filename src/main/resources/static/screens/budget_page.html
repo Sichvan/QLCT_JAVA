@@ -25,37 +25,9 @@
         .btn-cancel { flex: 1; padding: 14px; border-radius: 12px; border: none; background: #f1f5f9; color: #1f2937; font-weight: 600; cursor: pointer; transition: 0.2s;}
         .btn-submit { flex: 1; padding: 14px; border-radius: 12px; border: none; background: var(--primary-color); color: white; font-weight: 600; cursor: pointer; transition: 0.2s;}
 
-        /* CSS CHO THÔNG BÁO NỔI (TOAST NOTIFICATION) */
-        .toast-notification {
-            position: fixed;
-            bottom: 90px; /* Cách đáy một khoảng để không đè lên thanh nav ở Mobile */
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
-            font-weight: 600;
-            font-size: 14px;
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Hiệu ứng nảy nhẹ (bounce) */
-            z-index: 9999;
-            pointer-events: none;
-        }
-        .toast-notification.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        @media (min-width: 769px) {
-            .toast-notification {
-                bottom: 40px; 
-                left: calc(50% + 130px); /* Canh giữa phần content (bù cho sidebar) */
-            }
-        }
+        .toast-notification { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(100px); background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 12px 24px; border-radius: 50px; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); font-weight: 600; font-size: 14px; opacity: 0; transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 9999; pointer-events: none; }
+        .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        @media (min-width: 769px) { .toast-notification { bottom: 40px; left: calc(50% + 130px); } }
     </style>
 </head>
 <body>
@@ -73,9 +45,7 @@
         <main class="main-content">
             <header class="topbar">
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <div onclick="window.location.href='/screens/wallet.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'">
-                        <i class="material-icons">arrow_back</i>
-                    </div>
+                    <div onclick="window.location.href='/screens/wallet.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'"><i class="material-icons">arrow_back</i></div>
                     <h1 class="page-title">Ngân sách</h1>
                 </div>
             </header>
@@ -125,7 +95,6 @@
         const token = localStorage.getItem('jwt_token');
         if (!token) window.location.href = '/index.html';
 
-        // Fix lỗi gõ tiếng việt/Unikey
         function unformatCurrency(input) { if (input.value) input.value = input.value.replace(/\./g, ''); }
         function formatCurrency(input) {
             let val = input.value.replace(/\D/g, '');
@@ -136,19 +105,13 @@
             if (!formattedStr) return 0;
             return parseInt(formattedStr.toString().replace(/\D/g, ''), 10) || 0;
         }
-
         const formatCurrencyText = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 
-        // HÀM HIỂN THỊ THÔNG BÁO NỔI
         function showToastWarning() {
             const toast = document.getElementById('toast-notification');
             if(!toast) return;
-            // Hiện thông báo
             toast.classList.add('show');
-            // Tự động tắt sau 3.5 giây
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3500);
+            setTimeout(() => { toast.classList.remove('show'); }, 3500);
         }
 
         async function fetchBudgets() {
@@ -162,15 +125,14 @@
                     return;
                 }
 
-                let hasExceededBudget = false; // Biến kiểm tra xem có vượt không
+                let hasExceededBudget = false;
 
                 listDiv.innerHTML = budgets.map(budget => {
                     let percent = (budget.spentAmount / budget.limitAmount) * 100;
                     if (percent > 100) percent = 100;
                     
-                    // Tính toán vượt ngân sách
                     let isOver = budget.spentAmount > budget.limitAmount;
-                    if (isOver) hasExceededBudget = true; // Phát hiện có ngân sách bị vượt
+                    if (isOver) hasExceededBudget = true; 
                     
                     let colorClass = '';
                     if (percent > 75 && percent <= 100) colorClass = 'warning';
@@ -180,7 +142,10 @@
                         <div class="card">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <span class="bold" style="font-size: 16px;">${budget.categoryName || budget.category}</span>
-                                <i class="material-icons" style="color: var(--danger-color); cursor: pointer; font-size: 20px;" onclick="deleteBudget('${budget.id}')">delete</i>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <i class="material-icons" style="color: var(--primary-color); cursor: pointer; font-size: 20px;" onclick="editBudget('${budget.category}', ${budget.limitAmount})">edit</i>
+                                    <i class="material-icons" style="color: var(--danger-color); cursor: pointer; font-size: 20px;" onclick="deleteBudget('${budget.id}')">delete</i>
+                                </div>
                             </div>
                             <div class="progress-bar">
                                 <div class="progress-fill ${colorClass}" style="width: ${percent}%;"></div>
@@ -194,10 +159,7 @@
                     `;
                 }).join('');
 
-                // GỌI THÔNG BÁO NỔI NẾU CÓ VƯỢT NGÂN SÁCH
-                if (hasExceededBudget) {
-                    showToastWarning();
-                }
+                if (hasExceededBudget) showToastWarning();
 
             } catch (err) { console.error('Lỗi tải ngân sách:', err); }
         }
@@ -210,29 +172,40 @@
         }
 
         function openModal() { document.getElementById('budgetModal').classList.add('active'); }
-        function closeModal() { document.getElementById('budgetModal').classList.remove('active'); document.getElementById('budget-limit').value = ''; }
+        
+        // HÀM SỬA NGÂN SÁCH
+        function editBudget(cat, limit) {
+            document.getElementById('budget-cat').value = cat;
+            document.getElementById('budget-cat').disabled = true; // Khóa danh mục
+            document.getElementById('budget-limit').value = limit.toLocaleString('vi-VN');
+            document.getElementById('budgetModal').classList.add('active');
+        }
+
+        function closeModal() { 
+            document.getElementById('budgetModal').classList.remove('active'); 
+            document.getElementById('budget-limit').value = ''; 
+            document.getElementById('budget-cat').disabled = false; // Mở khóa
+        }
         
         async function submitBudget() {
             const catSelect = document.getElementById('budget-cat');
             const cat = catSelect.value;
             const catName = catSelect.options[catSelect.selectedIndex].text;
-            const limitStr = document.getElementById('budget-limit').value;
-            const limit = getRawNumber(limitStr);
+            const limit = getRawNumber(document.getElementById('budget-limit').value);
             
             if (limit <= 0) return alert("Số tiền không hợp lệ!");
             
             try {
                 await fetch('/api/budgets', {
-                    method: 'POST',
+                    method: 'POST', // Backend tự biết update nếu trùng category
                     headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ category: cat, categoryName: catName, limitAmount: limit })
                 });
                 closeModal();
-                fetchBudgets(); // Render lại danh sách
+                fetchBudgets(); 
             } catch (e) { alert("Lỗi kết nối!"); }
         }
 
-        // Tự động tải dữ liệu khi vừa vào trang
         fetchBudgets();
     </script>
 </body>

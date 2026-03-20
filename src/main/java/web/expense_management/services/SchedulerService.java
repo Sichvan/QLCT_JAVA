@@ -18,8 +18,8 @@ public class SchedulerService {
     @Autowired private ExpenseRepository expenseRepository;
     @Autowired private IncomeRepository incomeRepository;
 
-    // Chạy vào lúc 00:01 mỗi ngày
-    @Scheduled(cron = "0 1 0 * * ?")
+    // Đã thêm zone = "Asia/Ho_Chi_Minh" để chạy chuẩn 00:01 đêm giờ Việt Nam
+    @Scheduled(cron = "0 1 0 * * ?", zone = "Asia/Ho_Chi_Minh")
     public void runDailyRecurringTasks() {
         System.out.println("--- BẮT ĐẦU QUÉT GIAO DỊCH ĐỊNH KỲ ---");
         
@@ -40,7 +40,6 @@ public class SchedulerService {
                 expense.setUser(user.getId());
                 expense.setAmount(task.getAmount());
                 expense.setCategory(task.getCategory());
-                // Xử lý an toàn tránh NullPointerException
                 expense.setCategoryName(task.getCategoryName() != null ? task.getCategoryName() : "");
                 expense.setNote("[Định kỳ] " + (task.getNote() != null ? task.getNote() : ""));
                 expense.setDate(new Date());

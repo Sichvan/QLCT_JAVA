@@ -21,27 +21,21 @@ import java.util.Optional;
 @RequestMapping("/api/goals")
 public class GoalController {
 
-    @Autowired
-    private GoalRepository goalRepository;
+    @Autowired private GoalRepository goalRepository;
+    @Autowired private UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    // Lấy ID user từ Token
     private String getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = (User) authentication.getPrincipal();
         return currentUser.getId();
     }
 
-    // 1. LẤY DANH SÁCH MỤC TIÊU
     @GetMapping
     public ResponseEntity<List<Goal>> getGoals() {
         List<Goal> goals = goalRepository.findByUserOrderByCreatedAtDesc(getCurrentUserId());
         return ResponseEntity.ok(goals);
     }
 
-    // 2. TẠO MỤC TIÊU MỚI
     @PostMapping
     public ResponseEntity<?> createGoal(@RequestBody GoalRequest request) {
         Goal goal = new Goal();
@@ -54,7 +48,20 @@ public class GoalController {
         return ResponseEntity.status(201).body(savedGoal);
     }
 
-    // 3. NẠP TIỀN VÀO MỤC TIÊU
+    // THÊM HÀM SỬA MỤC TIÊU (PUT)
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateGoal(@PathVariable String id, @RequestBody GoalRequest request) {
+        Optional<Goal> goalOpt = goalRepository.findById(id);
+        if (goalOpt.isEmpty() || !goalOpt.get().getUser().equals(getCurrentUserId())) {
+            return ResponseEntity.status(404).body(Map.of("message", "Không tìm thấy mục tiêu"));
+        }
+        Goal goal = goalOpt.get();
+        goal.setName(request.getName());
+        goal.setTargetAmount(request.getTargetAmount());
+        goalRepository.save(goal);
+        return ResponseEntity.ok(goal);
+    }
+
     @PostMapping("/{id}/deposit")
     public ResponseEntity<?> depositToGoal(@PathVariable String id, @RequestBody DepositRequest request) {
         if (request.getAmount() <= 0) {
@@ -66,7 +73,6 @@ public class GoalController {
             return ResponseEntity.status(404).body(Map.of("message", "Không tìm thấy mục tiêu"));
         }
 
-        // Lấy thông tin user hiện tại từ DB để lấy số dư mới nhất
         User user = userRepository.findById(getCurrentUserId()).orElseThrow();
         Goal goal = goalOpt.get();
 
@@ -74,7 +80,6 @@ public class GoalController {
             return ResponseEntity.badRequest().body(Map.of("message", "Số dư ví không đủ để tiết kiệm"));
         }
 
-        // Thực hiện giao dịch
         user.setBalance(user.getBalance() - request.getAmount());
         goal.setCurrentAmount(goal.getCurrentAmount() + request.getAmount());
 
@@ -96,7 +101,6 @@ public class GoalController {
         return ResponseEntity.ok(response);
     }
 
-    // 4. XÓA MỤC TIÊU (Có hoàn tiền)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteGoal(@PathVariable String id) {
         Optional<Goal> goalOpt = goalRepository.findById(id);
@@ -107,7 +111,6 @@ public class GoalController {
         Goal goal = goalOpt.get();
         String message = "Đã xóa mục tiêu thành công";
 
-        // Hoàn tiền nếu mục tiêu chưa xong và đang có tiền
         if ("ongoing".equals(goal.getStatus()) && goal.getCurrentAmount() > 0 && goal.getCurrentAmount() < goal.getTargetAmount()) {
             User user = userRepository.findById(getCurrentUserId()).orElseThrow();
             user.setBalance(user.getBalance() + goal.getCurrentAmount());

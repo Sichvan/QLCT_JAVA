@@ -39,9 +39,7 @@
         <main class="main-content">
             <header class="topbar">
                 <div style="display: flex; align-items: center; gap: 16px;">
-                    <div onclick="window.location.href='/screens/wallet.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'">
-                        <i class="material-icons">arrow_back</i>
-                    </div>
+                    <div onclick="window.location.href='/screens/wallet.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'"><i class="material-icons">arrow_back</i></div>
                     <h1 class="page-title">Mục tiêu tiết kiệm</h1>
                 </div>
             </header>
@@ -58,7 +56,8 @@
 
     <div class="modal-overlay" id="addGoalModal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 24px; font-size: 20px;">Thêm mục tiêu mới</h2>
+            <h2 style="margin-bottom: 24px; font-size: 20px;">Thêm/Sửa mục tiêu</h2>
+            <input type="hidden" id="goal-id">
             <div class="form-group">
                 <label>Tên mục tiêu</label>
                 <input type="text" id="goal-name" class="form-control" placeholder="VD: Mua xe máy, Du lịch...">
@@ -69,7 +68,7 @@
             </div>
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeAddModal()">HỦY</button>
-                <button class="btn-submit" onclick="submitGoal()">TẠO MỤC TIÊU</button>
+                <button class="btn-submit" onclick="submitGoal()">LƯU LẠI</button>
             </div>
         </div>
     </div>
@@ -79,9 +78,9 @@
             <h2 style="margin-bottom: 12px; font-size: 20px;">Nạp tiền tiết kiệm</h2>
             <p id="deposit-goal-name" style="color: var(--text-main); font-weight: 600; margin-bottom: 4px;"></p>
             <p id="deposit-goal-remaining-text" style="color: var(--text-muted); font-size: 13px; margin-bottom: 24px;"></p>
-            
             <input type="hidden" id="deposit-goal-id">
-            <input type="hidden" id="deposit-goal-remaining"> <div class="form-group">
+            <input type="hidden" id="deposit-goal-remaining"> 
+            <div class="form-group">
                 <label>Số tiền nạp (VNĐ)</label>
                 <input type="tel" id="deposit-amount" class="form-control" placeholder="VD: 500.000" style="font-size: 24px; font-weight: bold; color: var(--success-color);" onfocus="unformatCurrency(this)" onblur="formatCurrency(this)" autocomplete="off">
             </div>
@@ -117,7 +116,6 @@
             }
         }
 
-        // Chống lỗi gõ tiếng Việt / Unikey
         function unformatCurrency(input) { if (input.value) input.value = input.value.replace(/\./g, ''); }
         function formatCurrency(input) {
             let val = input.value.replace(/\D/g, '');
@@ -131,7 +129,6 @@
 
         setupCurrencyInput('goal-target');
         setupCurrencyInput('deposit-amount');
-
         const formatCurrencyText = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 
         async function fetchGoals() {
@@ -148,26 +145,32 @@
                 listDiv.innerHTML = goals.map(goal => {
                     let percent = (goal.currentAmount / goal.targetAmount) * 100;
                     if (percent > 100) percent = 100;
-                    
+                    const isCompleted = percent >= 100 || goal.status === 'completed';
+
+                    const color = isCompleted ? '#4CAF50' : '#3A86FF';
+                    const icon = isCompleted ? 'emoji_events' : 'savings';
                     const safeName = goal.name.replace(/'/g, "\\'");
 
                     return `
                         <div class="card" style="cursor: pointer; transition: 0.2s;" onclick="openDepositModal('${goal.id}', '${safeName}', ${goal.currentAmount}, ${goal.targetAmount})">
                             <div style="display: flex; align-items: center;">
-                                <div style="background: rgba(67, 97, 238, 0.1); padding: 12px; border-radius: 50%; margin-right: 16px; display: flex; justify-content: center; align-items: center;">
-                                    <i class="material-icons" style="color: var(--primary-color);">savings</i>
+                                <div style="background: ${color}20; padding: 10px; border-radius: 50%; margin-right: 16px; display: flex; justify-content: center; align-items: center;">
+                                    <i class="material-icons" style="color: ${color};">${icon}</i>
                                 </div>
                                 <div style="flex: 1;">
                                     <div class="bold" style="font-size: 16px;">${goal.name}</div>
                                     <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Nhấn vào để nạp tiền</div>
                                 </div>
-                                <i class="material-icons" style="color: var(--danger-color); padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 8px;" onclick="event.stopPropagation(); deleteGoal('${goal.id}')">delete</i>
+                                <div style="display: flex; gap: 8px;">
+                                    <i class="material-icons" style="color: var(--primary-color); padding: 8px; background: rgba(67, 97, 238, 0.1); border-radius: 8px;" onclick="event.stopPropagation(); editGoal('${goal.id}', '${safeName}', ${goal.targetAmount})">edit</i>
+                                    <i class="material-icons" style="color: var(--danger-color); padding: 8px; background: rgba(239, 68, 68, 0.1); border-radius: 8px;" onclick="event.stopPropagation(); deleteGoal('${goal.id}')">delete</i>
+                                </div>
                             </div>
                             <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${percent}%; background: var(--primary-color);"></div>
+                                <div class="progress-fill" style="width: ${percent}%; background: ${color};"></div>
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                                <span class="bold" style="color: var(--primary-color);">${formatCurrencyText(goal.currentAmount)}</span>
+                                <span class="bold" style="color: ${color};">${formatCurrencyText(goal.currentAmount)}</span>
                                 <span style="color: var(--text-muted); font-weight: 500;">Mục tiêu: ${formatCurrencyText(goal.targetAmount)}</span>
                             </div>
                         </div>
@@ -177,7 +180,7 @@
         }
 
         async function deleteGoal(id) {
-            if (confirm("Bạn có chắc muốn xóa mục tiêu này? (Nếu mục tiêu chưa đầy, số tiền sẽ được hoàn lại vào ví)")) {
+            if (confirm("Bạn có chắc muốn xóa mục tiêu này? (Nếu chưa đầy, số tiền sẽ được hoàn lại vào ví)")) {
                 const res = await fetch(`/api/goals/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
                 alert(data.message);
@@ -186,33 +189,48 @@
         }
 
         function openAddModal() { document.getElementById('addGoalModal').classList.add('active'); }
-        function closeAddModal() { document.getElementById('addGoalModal').classList.remove('active'); document.getElementById('goal-name').value=''; document.getElementById('goal-target').value=''; }
+        
+        // HÀM SỬA MỤC TIÊU
+        function editGoal(id, name, targetAmount) {
+            document.getElementById('goal-id').value = id;
+            document.getElementById('goal-name').value = name;
+            document.getElementById('goal-target').value = targetAmount.toLocaleString('vi-VN');
+            document.getElementById('addGoalModal').classList.add('active');
+        }
+
+        function closeAddModal() { 
+            document.getElementById('addGoalModal').classList.remove('active'); 
+            document.getElementById('goal-id').value = ''; 
+            document.getElementById('goal-name').value=''; 
+            document.getElementById('goal-target').value=''; 
+        }
         
         async function submitGoal() {
+            const id = document.getElementById('goal-id').value;
             const name = document.getElementById('goal-name').value;
             const target = getRawNumber(document.getElementById('goal-target').value);
             if (!name) return alert("Vui lòng nhập tên mục tiêu!");
             if (target <= 0) return alert("Số tiền không hợp lệ!");
 
-            await fetch('/api/goals', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: name, targetAmount: target })
-            });
-            closeAddModal();
-            fetchGoals();
+            const payload = { name: name, targetAmount: target };
+
+            try {
+                if (id) {
+                    await fetch(`/api/goals/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                } else {
+                    await fetch('/api/goals', { method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                }
+                closeAddModal();
+                fetchGoals();
+            } catch(e) { alert("Lỗi kết nối"); }
         }
 
-        // TRUYỀN THÊM TIỀN HIỆN TẠI VÀ TIỀN MỤC TIÊU VÀO MODAL
         function openDepositModal(id, name, currentAmount, targetAmount) {
             const remaining = targetAmount - currentAmount;
-            
             document.getElementById('deposit-goal-id').value = id;
             document.getElementById('deposit-goal-remaining').value = remaining;
-            
             document.getElementById('deposit-goal-name').textContent = "Mục tiêu: " + name;
             document.getElementById('deposit-goal-remaining-text').textContent = "Số tiền còn thiếu: " + formatCurrencyText(remaining);
-            
             document.getElementById('depositModal').classList.add('active');
         }
 
@@ -227,11 +245,9 @@
             const remaining = parseFloat(document.getElementById('deposit-goal-remaining').value);
 
             if (amount <= 0) return alert("Số tiền nạp không hợp lệ!");
-
-            // XỬ LÝ LOGIC NẾU NHẬP LỐ TIỀN THÌ CHỈ LẤY PHẦN CÒN THIẾU
             if (amount > remaining) {
                 alert(`Bạn nhập dư tiền!\nHệ thống sẽ chỉ trích đúng ${formatCurrencyText(remaining)} để hoàn thành mục tiêu này.`);
-                amount = remaining; // Cắt giảm số tiền bằng với số còn thiếu
+                amount = remaining;
             }
 
             try {
@@ -251,9 +267,7 @@
                         alert("Nạp tiền thành công!");
                     }
                     fetchGoals();
-                } else {
-                    alert(data.message || "Lỗi nạp tiền! (Ví của bạn có đủ tiền không?)");
-                }
+                } else { alert(data.message || "Lỗi nạp tiền! (Ví của bạn có đủ tiền không?)"); }
             } catch (err) { console.error(err); }
         }
 
