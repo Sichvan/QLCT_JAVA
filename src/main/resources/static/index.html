@@ -4,8 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QLCT_HK Quản Lý Chi Tiêu</title>
+    <meta property="og:title" content="QLCT_HK Quản Lý Chi Tiêu">
+    <meta property="og:description" content="Ứng dụng quản lý tài chính cá nhân thông minh">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <script>
+        const savedToken = localStorage.getItem('jwt_token');
+        const savedUser = JSON.parse(localStorage.getItem('user_info') || '{}');
+        if (savedToken && savedToken.length > 20) {
+            if (savedUser.role === 'admin') {
+                window.location.replace('/screens/admin.html');
+            } else {
+                window.location.replace('/screens/home.html');
+            }
+        }
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         body {
@@ -14,17 +29,11 @@
             height: 100vh; color: #1f2937; overflow: hidden;
         }
         
-        /* Hiệu ứng kính */
         .auth-wrapper {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            width: 100%; max-width: 420px;
-            padding: 40px 32px; border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            border: 1px solid rgba(255,255,255,0.5);
-            margin: 16px; 
-            max-height: 90vh; overflow-y: auto;
-            animation: slideUp 0.5s ease-out;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
+            width: 100%; max-width: 420px; padding: 40px 32px; border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5);
+            margin: 16px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.5s ease-out;
         }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -62,15 +71,16 @@
         }
         #error-message:not(:empty) { display: block; }
 
-        /* --- CSS cho nút Hiện/Ẩn mật khẩu --- */
+        /* --- TẮT CON MẮT MẶC ĐỊNH CỦA TRÌNH DUYỆT (CHỐNG LỖI 2 CON MẮT) --- */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
+
+        /* --- CSS CHO CON MẮT CUSTOM CỦA CHÚNG TA --- */
         .toggle-password {
-            position: absolute;
-            right: 16px;
-            top: 38px;
-            color: #9ca3af;
-            cursor: pointer;
-            user-select: none;
-            transition: 0.3s;
+            position: absolute; right: 16px; top: 38px; color: #9ca3af;
+            cursor: pointer; user-select: none; transition: 0.3s;
         }
         .toggle-password:hover { color: #4361ee; }
         #password, #confirmPassword { padding-right: 48px !important; }
