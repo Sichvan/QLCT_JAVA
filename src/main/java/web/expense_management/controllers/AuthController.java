@@ -41,11 +41,11 @@ public class AuthController {
         otpService.savePendingUser(email, request);
 
         String otp = otpService.generateOtp(email);
-        String subject = "Mã xác nhận đăng ký tài khoản ExpensePro";
+        String subject = "Mã xác nhận đăng ký tài khoản QLCT_HK";
         String body = "Xin chào " + request.getFullName() + ",\n\n"
                     + "Mã OTP xác nhận đăng ký tài khoản của bạn là: " + otp + "\n"
                     + "Mã này sẽ hết hạn sau 5 phút.\n\n"
-                    + "Trân trọng,\nĐội ngũ ExpensePro";
+                    + "Trân trọng,\nĐội ngũ QLCT_HK";
         
         emailService.sendEmail(email, subject, body);
 
@@ -107,7 +107,7 @@ public class AuthController {
                     + "Vui lòng nhập mã này vào ứng dụng để đặt lại mật khẩu mới (Mã có hiệu lực trong 5 phút).\n\n"
                     + "Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.";
         
-        emailService.sendEmail(email, "Khôi phục mật khẩu ExpensePro", body);
+        emailService.sendEmail(email, "Khôi phục mật khẩu QLCT_HK", body);
         return ResponseEntity.ok(Map.of("message", "Đã gửi mã OTP khôi phục về email của bạn."));
     }
 

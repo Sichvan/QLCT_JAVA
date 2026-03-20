@@ -27,10 +27,9 @@ public class EmailService {
 
         Map<String, Object> requestBody = new HashMap<>();
         
-        // Bắt buộc dùng email này nếu chưa có tên miền riêng
-        requestBody.put("from", "ExpensePro <onboarding@resend.dev>");
+        // Đã thay đổi thành Tên hiển thị là QLCT_HK và Email tên miền chính chủ của bạn
+        requestBody.put("from", "QLCT_HK <noreply@sichvanstudio.id.vn>");
         
-        // Theo luật của Resend Free, biến 'to' này phải là email bạn đã đăng ký Resend
         requestBody.put("to", to); 
         requestBody.put("subject", subject);
         
