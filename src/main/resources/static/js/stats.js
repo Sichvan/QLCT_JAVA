@@ -1,10 +1,29 @@
 const token = localStorage.getItem('jwt_token');
 
+// TỪ ĐIỂN DỊCH TÊN DANH MỤC SANG TIẾNG VIỆT
 const categoryMap = {
-    'eating': 'Ăn uống', 'shopping': 'Mua sắm', 'transport': 'Di chuyển',
-    'education': 'Học tập', 'health': 'Sức khỏe', 'entertainment': 'Giải trí',
-    'other_expense': 'Chi tiêu khác', 'other_income': 'Tiền thu nhập', 'salary': 'Tiền lương',
-    'utilities': 'Tiện ích', 'gift': 'Quà tặng', 'investment': 'Đầu tư'
+    // Chi tiêu
+    'eating': 'Ăn uống', 
+    'shopping': 'Mua sắm', 
+    'transport': 'Di chuyển',
+    'education': 'Học tập', 
+    'health': 'Sức khỏe', 
+    'entertainment': 'Giải trí',
+    'utilities': 'Tiện ích', 
+    'gift': 'Quà tặng', 
+    'other_expense': 'Chi tiêu khác',
+    
+    // Thu nhập
+    'salary': 'Tiền lương',
+    'investment': 'Đầu tư', 
+    'gift_income': 'Được tặng',
+    'other_income': 'Thu nhập khác',
+
+    // Nhóm Vay & Nợ (Đã bổ sung để hiển thị đúng)
+    'borrowing': 'Đi vay',
+    'lending': 'Cho vay',
+    'repayment': 'Trả nợ',
+    'debt_collection': 'Thu nợ'
 };
 
 async function loadStats(type = 'expense') {
@@ -36,6 +55,7 @@ function render(data) {
     window.chartObj = new Chart(ctx, {
         type: 'doughnut',
         data: {
+            // Lấy tên tiếng Việt từ từ điển categoryMap
             labels: data.map(i => categoryMap[i.id] || i.id),
             datasets: [{ 
                 data: data.map(i => i.total), 
@@ -57,9 +77,9 @@ function render(data) {
         <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 12px; height: 12px; border-radius: 50%; background: ${colors[i % colors.length]};"></div>
-                <span class="bold">${categoryMap[item.id] || item.id}</span>
+                <span class="bold" style="color: var(--text-main);">${categoryMap[item.id] || item.id}</span>
             </div>
-            <span class="bold">${new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(item.total)}</span>
+            <span class="bold" style="color: var(--text-main);">${new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(item.total)}</span>
         </div>
     `).join('') : '<p style="text-align:center; padding:20px; color:var(--text-muted);">Không có dữ liệu</p>';
 }
