@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExpensePro - Quản Lý Chi Tiêu</title>
+    <title>QLCT_HK Quản Lý Chi Tiêu</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -61,6 +61,19 @@
             min-height: 20px; margin-bottom: 16px; background: rgba(239, 68, 68, 0.1); border-radius: 8px; padding: 8px; display: none;
         }
         #error-message:not(:empty) { display: block; }
+
+        /* --- CSS cho nút Hiện/Ẩn mật khẩu --- */
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 38px;
+            color: #9ca3af;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.3s;
+        }
+        .toggle-password:hover { color: #4361ee; }
+        #password, #confirmPassword { padding-right: 48px !important; }
     </style>
 </head>
 <body>
@@ -86,14 +99,17 @@
                 <label>Email</label>
                 <input type="email" id="email" required placeholder="example@gmail.com">
             </div>
+            
             <div class="input-group">
                 <label>Mật khẩu</label>
                 <input type="password" id="password" required placeholder="••••••••">
+                <span class="material-icons toggle-password" onclick="togglePassword('password', this)">visibility_off</span>
             </div>
 
             <div class="input-group" id="confirm-password-group" style="display: none;">
                 <label>Xác nhận mật khẩu</label>
                 <input type="password" id="confirmPassword" placeholder="••••••••">
+                <span class="material-icons toggle-password" onclick="togglePassword('confirmPassword', this)">visibility_off</span>
             </div>
 
             <p id="error-message"></p>

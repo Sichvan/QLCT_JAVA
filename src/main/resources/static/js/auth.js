@@ -1,3 +1,20 @@
+// ========================================================
+// HÀM HIỂN THỊ / ẨN MẬT KHẨU
+// ========================================================
+function togglePassword(inputId, iconElement) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        iconElement.textContent = 'visibility';
+    } else {
+        input.type = 'password';
+        iconElement.textContent = 'visibility_off';
+    }
+}
+
+// ========================================================
+// LOGIC XỬ LÝ FORM AUTH
+// ========================================================
 document.addEventListener('DOMContentLoaded', () => {
     // Dọn dẹp token lỗi (nếu có)
     const token = localStorage.getItem('jwt_token');
@@ -18,11 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
 
-    // ========================================================
-    // 1. TỰ ĐỘNG BƠM THÊM Ô NHẬP OTP & QUÊN MẬT KHẨU VÀO UI CỦA BẠN
-    // ========================================================
-    
-    // Tạo ô nhập OTP 
+    // 1. TỰ ĐỘNG BƠM THÊM Ô NHẬP OTP & QUÊN MẬT KHẨU VÀO UI
     const otpGroup = document.createElement('div');
     otpGroup.className = 'input-group';
     otpGroup.style.display = 'none';
@@ -30,10 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <label>Mã OTP (6 số gửi về Email)</label>
         <input type="text" id="otpCode" placeholder="Nhập mã OTP 6 số" maxlength="6" autocomplete="off">
     `;
-    // Chèn ô OTP vào ngay trên dòng báo lỗi
     form.insertBefore(otpGroup, errorMessage);
 
-    // Tạo link Quên Mật Khẩu
     const forgotLinkContainer = document.createElement('div');
     forgotLinkContainer.style.textAlign = 'center';
     forgotLinkContainer.style.marginTop = '16px';
@@ -43,21 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
     form.appendChild(forgotLinkContainer);
     const btnForgot = document.getElementById('btn-forgot');
 
-
-    // ========================================================
     // 2. QUẢN LÝ CÁC CHẾ ĐỘ HIỂN THỊ CỦA FORM
-    // ========================================================
-    let currentMode = 'LOGIN'; // Trạng thái: LOGIN, REGISTER, VERIFY_REG, FORGOT, RESET
+    let currentMode = 'LOGIN';
     let pendingEmail = '';
 
     function showMessage(msg, isSuccess = false) {
         errorMessage.textContent = msg;
         errorMessage.style.display = 'block';
         if (isSuccess) {
-            errorMessage.style.color = '#10b981'; // Màu xanh lá success
+            errorMessage.style.color = '#10b981';
             errorMessage.style.background = 'rgba(16, 185, 129, 0.1)';
         } else {
-            errorMessage.style.color = '#ef4444'; // Màu đỏ danger
+            errorMessage.style.color = '#ef4444';
             errorMessage.style.background = 'rgba(239, 68, 68, 0.1)';
         }
     }
@@ -66,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         errorMessage.textContent = ''; 
         errorMessage.style.display = 'none';
         
-        // Trạng thái mặc định: Reset hiển thị
         registerFields.style.display = 'none';
         confirmPwGroup.style.display = 'none'; 
         otpGroup.style.display = 'none';
@@ -152,12 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUI();
     });
 
-    updateUI(); // Load giao diện ban đầu
+    updateUI();
 
-
-    // ========================================================
-    // 3. XỬ LÝ GỌI API KHI BẤM NÚT SUBMIT
-    // ========================================================
+    // 3. XỬ LÝ GỌI API
     form.addEventListener('submit', async (e) => {
         e.preventDefault(); 
         errorMessage.style.display = 'none';
@@ -167,14 +171,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmPassword = confirmPasswordInput.value;
         const otpCode = document.getElementById('otpCode').value.trim();
         
-        // --- KIỂM TRA CHUNG ---
         if (!email.endsWith('@gmail.com')) {
             return showMessage('Email phải có định dạng đuôi là @gmail.com');
         }
 
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
 
-        // --- CHUẨN BỊ API THEO TỪNG CHẾ ĐỘ ---
         let url = '';
         let payload = {};
 
@@ -212,7 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
             payload = { email: pendingEmail, otp: otpCode, newPassword: password };
         }
 
-        // --- GỌI API ---
         submitBtn.disabled = true;
         const originalBtnText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="material-icons" style="font-size: 20px;">hourglass_empty</i> Đang xử lý...';
@@ -227,7 +228,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (response.ok) {
-                // XỬ LÝ THÀNH CÔNG
                 if (currentMode === 'LOGIN' || currentMode === 'VERIFY_REG') {
                     localStorage.setItem('jwt_token', data.token);
                     localStorage.setItem('user_info', JSON.stringify(data.user));
@@ -264,7 +264,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText; 
-            // Trả lại nội dung nút chuẩn nếu không bị chuyển trang
             if (currentMode === 'VERIFY_REG') submitBtn.innerHTML = '<i class="material-icons" style="font-size: 20px;">verified</i> Hoàn tất Đăng ký';
             if (currentMode === 'RESET') submitBtn.innerHTML = '<i class="material-icons" style="font-size: 20px;">save</i> Lưu mật khẩu mới';
         }
