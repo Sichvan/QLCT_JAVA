@@ -1,4 +1,5 @@
 const token = localStorage.getItem('jwt_token');
+if (!token) window.location.href = '/index.html';
 
 // TỪ ĐIỂN DỊCH TÊN DANH MỤC SANG TIẾNG VIỆT
 const categoryMap = {
@@ -19,11 +20,11 @@ const categoryMap = {
     'gift_income': 'Được tặng',
     'other_income': 'Thu nhập khác',
 
-    // Nhóm Vay & Nợ (Đã bổ sung để hiển thị đúng)
+    // Nhóm Vay & Nợ (Đã cập nhật chuẩn ID khớp với trang Thêm giao dịch)
     'borrowing': 'Đi vay',
     'lending': 'Cho vay',
-    'repayment': 'Trả nợ',
-    'debt_collection': 'Thu nợ'
+    'repaying': 'Trả nợ',
+    'collecting': 'Thu nợ'
 };
 
 async function loadStats(type = 'expense') {
@@ -32,9 +33,12 @@ async function loadStats(type = 'expense') {
         btn.style.background = 'none';
         btn.style.color = 'var(--text-muted)';
     });
+    
     const activeTab = document.getElementById(`tab-${type}`);
-    activeTab.style.background = 'var(--primary-color)';
-    activeTab.style.color = 'white';
+    if (activeTab) {
+        activeTab.style.background = 'var(--primary-color)';
+        activeTab.style.color = 'white';
+    }
 
     try {
         const res = await fetch(`/api/stats/pie-chart?type=${type}`, { 
@@ -42,17 +46,22 @@ async function loadStats(type = 'expense') {
         });
         const data = await res.json();
         render(data);
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+        console.error("Lỗi khi tải dữ liệu thống kê:", e); 
+    }
 }
 
 function render(data) {
-    const ctx = document.getElementById('myChart').getContext('2d');
+    const ctx = document.getElementById('myChart');
+    if (!ctx) return; // Bảo vệ lỗi nếu không tìm thấy canvas
+    
     const list = document.getElementById('stat-list');
     const colors = ['#4361ee', '#4cc9f0', '#f72585', '#7209b7', '#10b981', '#f59e0b', '#3a0ca3', '#ef4444'];
     
+    // Hủy biểu đồ cũ nếu có trước khi vẽ cái mới
     if (window.chartObj) window.chartObj.destroy();
     
-    window.chartObj = new Chart(ctx, {
+    window.chartObj = new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
         data: {
             // Lấy tên tiếng Việt từ từ điển categoryMap
@@ -73,15 +82,20 @@ function render(data) {
         }
     });
 
-    list.innerHTML = data.length ? data.map((item, i) => `
-        <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color);">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 12px; height: 12px; border-radius: 50%; background: ${colors[i % colors.length]};"></div>
-                <span class="bold" style="color: var(--text-main);">${categoryMap[item.id] || item.id}</span>
+    // Render danh sách chi tiết bên dưới biểu đồ
+    if (list) {
+        list.innerHTML = data.length ? data.map((item, i) => `
+            <div style="display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 12px; height: 12px; border-radius: 50%; background: ${colors[i % colors.length]};"></div>
+                    <span class="bold" style="color: var(--text-main);">${categoryMap[item.id] || item.id}</span>
+                </div>
+                <span class="bold" style="color: var(--text-main);">${new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(item.total)}</span>
             </div>
-            <span class="bold" style="color: var(--text-main);">${new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(item.total)}</span>
-        </div>
-    `).join('') : '<p style="text-align:center; padding:20px; color:var(--text-muted);">Không có dữ liệu</p>';
+        `).join('') : '<p style="text-align:center; padding:20px; color:var(--text-muted);">Không có dữ liệu</p>';
+    }
 }
 
+// Hàm này để tự động tải dữ liệu nếu cần, nhưng trang HTML của bạn đã có onload="initStatsPage();" rồi.
+// Vẫn giữ lại để backup nhé.
 loadStats('expense');
