@@ -31,8 +31,8 @@ async function fetchHomeData() {
         const listDiv = document.getElementById('tx-list');
         listDiv.innerHTML = '';
         
-        if(data.transactions.length === 0) {
-            listDiv.innerHTML = '<p class="text-center" style="color: grey; margin-top: 20px;">Chưa có giao dịch nào</p>';
+        if (data.transactions.length === 0) {
+            listDiv.innerHTML = `<p class="text-center" style="color: grey; margin-top: 20px;">${t('home.no_tx')}</p>`;
             return;
         }
 
@@ -40,7 +40,8 @@ async function fetchHomeData() {
             let colorClass = tx.type === 'income' ? 'text-success' : (tx.type === 'expense' ? 'text-danger' : '');
             let sign = tx.type === 'expense' ? '-' : (tx.type === 'income' ? '+' : '');
             const safeNote = tx.note ? tx.note.replace(/'/g, "\\'") : '';
-            const safeCatName = tx.categoryName ? tx.categoryName.replace(/'/g, "\\'") : tx.category;
+            const translatedCatName = t('cat.' + tx.category) !== 'cat.' + tx.category ? t('cat.' + tx.category) : tx.categoryName;
+            const safeCatName = translatedCatName ? translatedCatName.replace(/'/g, "\\'") : tx.category;
 
             listDiv.innerHTML += `
                 <div class="tx-item" style="position: relative; display: flex; align-items: center;">
@@ -48,7 +49,7 @@ async function fetchHomeData() {
                         <img src="/assets/icons/${tx.category}.png" width="28" height="28" onerror="this.outerHTML='<i class=\\'material-icons\\' style=\\'color: #64748b;\\'>category</i>'">
                     </div>
                     <div class="tx-info" style="flex: 1;">
-                        <div class="tx-title">${safeCatName}</div>
+                        <div class="tx-title">${safeCatName}${tx.type === 'loan' && tx.personName ? ' — ' + tx.personName : ''}</div>
                         <div class="tx-date">${formatDate(tx.date)} ${tx.note ? '• '+tx.note : ''}</div>
                     </div>
                     <div class="tx-amount ${colorClass}" style="margin-right: 90px;">${sign}${formatCurrencyText(tx.amount)}</div>
@@ -104,12 +105,12 @@ async function checkBudgetExceeded() {
 }
 
 async function deleteTx(id) {
-    if (confirm("Bạn có chắc chắn muốn xóa giao dịch này không? Số dư ví sẽ được cập nhật lại.")) {
+    if (confirm(t('home.confirm_delete') || "Bạn có chắc chắn muốn xóa giao dịch này không? Số dư ví sẽ được cập nhật lại.")) {
         try {
             await fetch(`/api/transactions/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
             fetchHomeData(); 
             checkBudgetExceeded(); // Cập nhật lại xem còn bị vượt không sau khi xóa
-        } catch(e) { alert("Lỗi khi xóa giao dịch!"); }
+        } catch(e) { alert(t('home.err_delete') || "Lỗi khi xóa giao dịch!"); }
     }
 }
 
@@ -142,7 +143,8 @@ async function openEditModal(id, type, amount, category, note, dateStr) {
     userCategories.forEach(cat => {
         if (type === 'loan' || cat.type === type) {
             const isSelected = (cat.icon === category) ? 'selected' : '';
-            selectBox.innerHTML += `<option value="${cat.icon}" ${isSelected}>${cat.name}</option>`;
+            const displayName = typeof tCat === 'function' ? tCat(cat.icon || cat.id, cat.name) : cat.name;
+            selectBox.innerHTML += `<option value="${cat.icon}" ${isSelected}>${displayName}</option>`;
         }
     });
 
@@ -167,7 +169,7 @@ async function submitEditTx() {
     const category = catSelect.value;
     const categoryName = catSelect.options[catSelect.selectedIndex].text;
 
-    if (!amount || amount <= 0) return alert("Số tiền không hợp lệ!");
+    if (!amount || amount <= 0) return alert(t('home.err_amount') || "Số tiền không hợp lệ!");
 
     const payload = { type: type, amount: amount, category: category, categoryName: categoryName, date: new Date(date).toISOString(), note: note };
 
@@ -182,8 +184,8 @@ async function submitEditTx() {
             closeEditModal();
             fetchHomeData(); 
             checkBudgetExceeded(); // Cập nhật lại cảnh báo
-        } else { alert("Lỗi cập nhật giao dịch!"); }
-    } catch (e) { alert("Không thể kết nối máy chủ"); }
+        } else { alert(t('home.err_update') || "Lỗi cập nhật giao dịch!"); }
+    } catch (e) { alert(t('home.err_server') || "Không thể kết nối máy chủ"); }
 }
 
 // Chạy khi khởi động trang chủ

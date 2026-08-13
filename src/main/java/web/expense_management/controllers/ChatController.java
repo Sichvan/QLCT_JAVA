@@ -37,8 +37,10 @@ public class ChatController {
         User user = userRepository.findById(getCurrentUserId()).orElseThrow();
         String context = String.format("Tên: %s. Số dư ví hiện tại: %,.0f VNĐ.", user.getFullName(), user.getBalance());
 
-        // Chỉ truyền tin nhắn và bối cảnh tài chính
-        String aiReply = aiService.getFinancialAdvice(message, context);
+        String lang = request.getOrDefault("lang", "vi");
+
+        // Chỉ truyền tin nhắn, bối cảnh tài chính và ngôn ngữ
+        String aiReply = aiService.getFinancialAdvice(message, context, lang);
 
         return ResponseEntity.ok(Map.of("reply", aiReply));
     }

@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ - QLCT_HK</title>
+    <title data-i18n="nav.home">Trang chủ - QLCT_HK</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
@@ -45,26 +45,18 @@
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         @media (min-width: 769px) { .toast-notification { bottom: 40px; left: calc(50% + 130px); } }
     </style>
+<script src="/js/i18n.js"></script>
 </head>
 <body>
     <div class="dashboard-layout">
         
-        <aside class="sidebar">
-            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> QLCT_HK</div>
-            <nav class="sidebar-menu">
-                <a href="/screens/home.html" class="menu-item active"><i class="material-icons">dashboard</i> Tổng quan</a>
-                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
-                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
-                <a href="/screens/chat.html" class="menu-item"><i class="material-icons">smart_toy</i> Trợ lý AI</a>
-            </nav>
-            <div class="sidebar-footer"><a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a></div>
-        </aside>
+        <aside id="sidebar-container" class="sidebar"></aside>
 
         <main class="main-content">
             <header class="topbar">
                 <div>
-                    <h1 class="page-title">Chào buổi sáng,</h1>
-                    <p id="header-user-name" style="color: var(--text-muted); font-size: 14px; font-weight: 500;">Đang tải...</p>
+                    <h1 class="page-title" data-i18n="home.greeting">Chào buổi sáng,</h1>
+                    <p id="header-user-name" style="color: var(--text-muted); font-size: 14px; font-weight: 500;" data-i18n="home.loading">Đang tải...</p>
                 </div>
                 <div class="user-profile" onclick="window.location.href='/screens/settings.html'" style="cursor: pointer;">
                     <div id="header-avatar" style="width: 48px; height: 48px; border-radius: 50%; background-color: var(--primary-color); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; color: white; box-shadow: var(--shadow-sm);">
@@ -76,10 +68,10 @@
             <div class="content-area">
                 <div class="grid-cards">
                     <div class="card gradient-card">
-                        <div class="stat-label">Tổng Tài Sản Hiện Có</div>
+                        <div class="stat-label" data-i18n="home.total_assets">Tổng Tài Sản Hiện Có</div>
                         <div class="stat-value" id="total-balance">0 ₫</div>
                         <div class="flex-between" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 16px; margin-top: 12px;">
-                            <span style="font-size: 14px; color: rgba(255,255,255,0.9);">Cập nhật: <b id="current-date">Hôm nay</b></span>
+                            <span style="font-size: 14px; color: rgba(255,255,255,0.9);"><span data-i18n="home.updated">Cập nhật:</span> <b id="current-date">Hôm nay</b></span>
                             <i class="material-icons" style="opacity: 0.9;">account_balance_wallet</i>
                         </div>
                     </div>
@@ -87,7 +79,7 @@
                     <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 24px;">
                         <div class="flex-between" style="margin-bottom: 16px;">
                             <div>
-                                <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Thu nhập tháng</div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;" data-i18n="home.month_income">Thu nhập tháng</div>
                                 <div class="text-success" id="month-income" style="font-size: 26px; font-weight: 700;">0 ₫</div>
                             </div>
                             <div style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
@@ -97,7 +89,7 @@
                         <div style="height: 1px; background: var(--border-color); margin: 12px 0;"></div>
                         <div class="flex-between">
                             <div>
-                                <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Chi tiêu tháng</div>
+                                <div style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;" data-i18n="home.month_expense">Chi tiêu tháng</div>
                                 <div class="text-danger" id="month-expense" style="font-size: 26px; font-weight: 700;">0 ₫</div>
                             </div>
                             <div style="width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center;">
@@ -108,64 +100,64 @@
                 </div>
 
                 <div class="flex-between" style="margin-bottom: 20px; margin-top: 12px;">
-                    <h2 style="font-size: 20px; font-weight: 600; color: var(--text-main);">Giao dịch gần đây</h2>
-                    <button class="btn-primary" onclick="window.location.href='/screens/transaction_add.html'"><i class="material-icons">add</i> Ghi chép</button>
+                    <h2 style="font-size: 20px; font-weight: 600; color: var(--text-main);" data-i18n="home.recent">Giao dịch gần đây</h2>
+                    <button class="btn-primary" onclick="window.location.href='/screens/transaction_add.html'"><i class="material-icons">add</i> <span data-i18n="home.add">Ghi chép</span></button>
                 </div>
 
                 <div class="card" id="tx-list" style="padding: 12px 24px;">
                     <p class="text-center" style="color: var(--text-muted); padding: 40px 0;">
                         <i class="material-icons" style="font-size: 48px; opacity: 0.3; display: block; margin-bottom: 12px;">history</i>
-                        Đang tải dữ liệu...
+                        <span data-i18n="home.loading_tx">Đang tải dữ liệu...</span>
                     </p>
                 </div>
             </div>
         </main>
 
         <nav class="bottom-nav">
-            <a href="/screens/home.html" class="nav-item active"><i class="material-icons">home</i><span>Trang chủ</span></a>
-            <a href="/screens/wallet.html" class="nav-item"><i class="material-icons">account_balance_wallet</i><span>Ví</span></a>
+            <a href="/screens/home.html" class="nav-item active"><i class="material-icons">home</i><span data-i18n="nav.home">Trang chủ</span></a>
+            <a href="/screens/wallet.html" class="nav-item"><i class="material-icons">account_balance_wallet</i><span data-i18n="nav.wallet">Ví</span></a>
            <a href="/screens/chat.html" class="nav-item" style="position: relative;">
                 <div class="fab-mobile"><i class="material-icons" style="font-size: 28px;">smart_toy</i></div>
                 <span style="opacity: 0;">AI</span>
             </a> 
-            <a href="/screens/stats.html" class="nav-item"><i class="material-icons">pie_chart</i><span>Thống kê</span></a>
-            <a href="/screens/settings.html" class="nav-item"><i class="material-icons">person</i><span>Cá nhân</span></a>
+            <a href="/screens/stats.html" class="nav-item"><i class="material-icons">pie_chart</i><span data-i18n="nav.stats">Thống kê</span></a>
+            <a href="/screens/settings.html" class="nav-item"><i class="material-icons">person</i><span data-i18n="nav.personal">Cá nhân</span></a>
         </nav>
     </div>
 
     <div id="toast-notification" class="toast-notification">
         <i class="material-icons" style="font-size: 20px;">error_outline</i>
-        <span>Cảnh báo: Chi tiêu tháng này đã vượt ngân sách!</span>
+        <span data-i18n="home.budget_warning">Cảnh báo: Chi tiêu tháng này đã vượt ngân sách!</span>
     </div>
 
     <div class="modal-overlay" id="editTxModal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 24px; font-size: 20px;">Sửa giao dịch</h2>
+            <h2 style="margin-bottom: 24px; font-size: 20px;" data-i18n="home.edit_tx">Sửa giao dịch</h2>
             <input type="hidden" id="edit-tx-id"><input type="hidden" id="edit-tx-type">
             <div class="form-group">
-                <label>Số tiền (VNĐ)</label>
+                <label data-i18n="home.amount">Số tiền (VNĐ)</label>
                 <input type="tel" id="edit-tx-amount" class="form-control" style="font-size: 20px; font-weight: bold; color: var(--primary-color);" onfocus="unformatCurrency(this)" onblur="formatCurrency(this)" autocomplete="off">
             </div>
             <div class="form-group">
-                <label>Danh mục</label>
+                <label data-i18n="home.category">Danh mục</label>
                 <select id="edit-tx-category" class="form-control"></select>
             </div>
             <div class="form-group">
-                <label>Ngày giao dịch</label>
+                <label data-i18n="home.date">Ngày giao dịch</label>
                 <input type="date" id="edit-tx-date" class="form-control">
             </div>
             <div class="form-group">
-                <label>Ghi chú</label>
+                <label data-i18n="home.note">Ghi chú</label>
                 <input type="text" id="edit-tx-note" class="form-control" autocomplete="off">
             </div>
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeEditModal()">HỦY</button>
-                <button class="btn-submit" onclick="submitEditTx()"><i class="material-icons" style="font-size: 18px; vertical-align: middle;">save</i> CẬP NHẬT</button>
+                <button class="btn-cancel" onclick="closeEditModal()" data-i18n="home.cancel">HỦY</button>
+                <button class="btn-submit" onclick="submitEditTx()"><i class="material-icons" style="font-size: 18px; vertical-align: middle;">save</i> <span data-i18n="home.update">CẬP NHẬT</span></button>
             </div>
         </div>
     </div>
 
-    <script src="/js/home.js"></script>
+        <script src="/js/home.js"></script>
     <script>
         if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
         document.addEventListener('DOMContentLoaded', () => {
@@ -181,5 +173,6 @@
             }
         });
     </script>
+<script src="/js/sidebar.js"></script>
 </body>
 </html>

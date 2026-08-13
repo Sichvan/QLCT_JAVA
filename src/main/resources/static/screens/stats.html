@@ -1,31 +1,19 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thống kê - QLCT_HK</title>
+    <title data-i18n="stats.title">Thống kê - QLCT_HK</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+<script src="/js/i18n.js"></script>
 </head>
 <body onload="initStatsPage();">
     <div class="dashboard-layout">
         
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <i class="material-icons">account_balance_wallet</i> QLCT_Hk
-            </div>
-            <nav class="sidebar-menu">
-                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
-                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
-                <a href="/screens/stats.html" class="menu-item active"><i class="material-icons">pie_chart</i> Thống kê</a>
-                <a href="/screens/chat.html" class="menu-item"><i class="material-icons">smart_toy</i> Trợ lý AI</a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a>
-            </div>
-        </aside>
+        <aside id="sidebar-container" class="sidebar"></aside>
 
         <main class="main-content">
             <header class="topbar">
@@ -39,34 +27,50 @@
             </header>
 
             <div class="content-area">
+                <h1 class="page-title" data-i18n="stats.title">Thống kê</h1>
+
                 <div style="display: flex; background: var(--border-color); border-radius: 14px; padding: 6px; margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                    <div class="tab-btn" id="tab-expense" onclick="loadStats('expense')" style="flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: var(--text-main);">Chi Tiêu</div>
-                    <div class="tab-btn" id="tab-income" onclick="loadStats('income')" style="flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: var(--text-main);">Thu Nhập</div>
+                    <div class="tab-btn" id="tab-expense" onclick="loadStats('expense')" style="flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: var(--text-main);" data-i18n="stats.expense">Chi Tiêu</div>
+                    <div class="tab-btn" id="tab-income" onclick="loadStats('income')" style="flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 10px; font-weight: 600; transition: all 0.3s ease; color: var(--text-main);" data-i18n="stats.income">Thu Nhập</div>
+                </div>
+
+                <!-- BỘ LỌC THỜI GIAN -->
+                <div class="card" style="padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <i class="material-icons" style="color: var(--primary-color);">date_range</i>
+                    <select id="stats-filter-type" onchange="onStatsFilterChange()" style="padding: 10px 14px; border: 2px solid var(--border-color); border-radius: 10px; font-size: 14px; background: var(--bg-color); color: var(--text-main); outline: none; font-weight: 600;">
+                        <option value="30days" data-i18n="stats.30days">30 ngày qua</option>
+                        <option value="day" data-i18n="stats.by_day">Theo ngày</option>
+                        <option value="month" data-i18n="stats.by_month">Theo tháng</option>
+                        <option value="year" data-i18n="stats.by_year">Theo năm</option>
+                    </select>
+                    <input type="date" id="stats-filter-date" style="padding: 10px 14px; border: 2px solid var(--border-color); border-radius: 10px; font-size: 14px; background: var(--bg-color); color: var(--text-main); outline: none; display: none;">
+                    <button onclick="applyStatsFilter()" style="padding: 10px 18px; border-radius: 10px; border: none; background: var(--primary-color); color: white; font-weight: 600; cursor: pointer; font-size: 14px;"><i class="material-icons" style="font-size: 16px; vertical-align: middle;">search</i> <span data-i18n="stats.filter">Lọc</span></button>
                 </div>
 
                 <div class="card" style="height: 400px; display: flex; justify-content: center; align-items: center; position: relative; padding: 32px;">
                     <canvas id="myChart"></canvas>
                 </div>
-
-                <h2 style="margin: 32px 0 16px; font-size: 20px; font-weight: 600; color: var(--text-main);">Chi tiết danh mục</h2>
+                
+                <h3 style="margin-top: 32px; margin-bottom: 16px; font-size: 18px; color: var(--text-main);" data-i18n="stats.detail">Chi tiết danh mục</h3>
                 <div class="card" id="stat-list" style="padding: 12px 24px;">
-                    <p style="text-align:center; padding:20px; color:var(--text-muted);">Đang tải dữ liệu...</p>
+                    <p class="text-center" style="color: var(--text-muted); padding: 40px 0;" data-i18n="stats.loading">Đang tải dữ liệu...</p>
                 </div>
             </div>
         </main>
 
         <nav class="bottom-nav">
-            <a href="/screens/home.html" class="nav-item"><i class="material-icons">home</i><span>Trang chủ</span></a>
-            <a href="/screens/wallet.html" class="nav-item"><i class="material-icons">account_balance_wallet</i><span>Ví</span></a>
+            <a href="/screens/home.html" class="nav-item"><i class="material-icons">home</i><span data-i18n="nav.home">Trang chủ</span></a>
+            <a href="/screens/wallet.html" class="nav-item"><i class="material-icons">account_balance_wallet</i><span data-i18n="nav.wallet">Ví</span></a>
            <a href="/screens/chat.html" class="nav-item" style="position: relative;">
                 <div class="fab-mobile"><i class="material-icons" style="font-size: 28px;">smart_toy</i></div>
                 <span style="opacity: 0;">AI</span>
-            </a>    
-            <a href="/screens/stats.html" class="nav-item active"><i class="material-icons">pie_chart</i><span>Thống kê</span></a>
-            <a href="/screens/settings.html" class="nav-item"><i class="material-icons">person</i><span>Cá nhân</span></a>
+            </a> 
+            <a href="/screens/stats.html" class="nav-item active"><i class="material-icons">pie_chart</i><span data-i18n="nav.stats">Thống kê</span></a>
+            <a href="/screens/settings.html" class="nav-item"><i class="material-icons">person</i><span data-i18n="nav.personal">Cá nhân</span></a>
         </nav>
     </div>
 
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/js/stats.js"></script>
     <script>
         function initStatsPage() {
@@ -83,5 +87,6 @@
             loadStats('expense');
         }
     </script>
+<script src="/js/sidebar.js"></script>
 </body>
 </html>

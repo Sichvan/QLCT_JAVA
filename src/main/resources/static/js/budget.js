@@ -17,7 +17,7 @@ async function fetchBudgets() {
             listDiv.innerHTML = `
                 <div class="text-center" style="color: grey; margin-top: 40px;">
                     <i class="material-icons" style="font-size: 64px; opacity: 0.5;">account_balance_wallet</i>
-                    <p style="margin-top: 10px;">Chưa có ngân sách nào được thiết lập</p>
+                    <p style="margin-top: 10px;">${t('budget.no_budget')}</p>
                 </div>
             `;
             return;
@@ -33,10 +33,11 @@ async function fetchBudgets() {
             if (percent > 75 && percent <= 100) colorClass = 'warning';
             if (budget.isExceeded) colorClass = 'danger';
 
+            const translatedCatName = tCat(budget.category, budget.categoryName);
             listDiv.innerHTML += `
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span class="bold" style="font-size: 16px;">${budget.categoryName || budget.category}</span>
+                        <span class="bold" style="font-size: 16px;">${translatedCatName}</span>
                         <i class="material-icons" style="color: red; cursor: pointer; font-size: 20px;" onclick="deleteBudget('${budget.id}')">delete</i>
                     </div>
                     
@@ -45,23 +46,23 @@ async function fetchBudgets() {
                     </div>
                     
                     <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                        <span style="color: ${budget.isExceeded ? 'red' : 'green'}; font-weight: bold;">Đã chi: ${formatCurrency(budget.spentAmount)}</span>
-                        <span class="bold">Hạn mức: ${formatCurrency(budget.limitAmount)}</span>
+                        <span style="color: ${budget.isExceeded ? 'red' : 'green'}; font-weight: bold;">${t('budget.spent')}: ${formatCurrency(budget.spentAmount)}</span>
+                        <span class="bold">${t('budget.limit')}: ${formatCurrency(budget.limitAmount)}</span>
                     </div>
                     
-                    ${budget.isExceeded ? '<p style="color: red; font-size: 12px; margin-top: 8px; font-style: italic;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">warning</i> Đã vượt ngân sách!</p>' : ''}
+                    ${budget.isExceeded ? `<p style="color: red; font-size: 12px; margin-top: 8px; font-style: italic;"><i class="material-icons" style="font-size: 14px; vertical-align: middle;">warning</i> ${t('budget.exceeded')}</p>` : ''}
                 </div>
             `;
         });
     } catch (err) {
-        console.error('Lỗi tải ngân sách:', err);
+        console.error('Error loading budgets:', err);
     }
 }
 
 async function deleteBudget(id) {
-    if (confirm("Bạn có chắc muốn xóa ngân sách này?")) {
+    if (confirm(t('budget.confirm_delete'))) {
         await fetch(`/api/budgets/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-        fetchBudgets(); // Tải lại danh sách
+        fetchBudgets();
     }
 }
 

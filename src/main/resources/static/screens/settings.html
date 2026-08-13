@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cài đặt - QLCT_HK</title>
+    <title data-i18n="settings.title">Cài đặt cá nhân - QLCT_HK</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script>if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
@@ -17,25 +17,15 @@
         }
         .avatar-container:hover .avatar-overlay { opacity: 1; }
     </style>
+<script src="/js/i18n.js"></script>
 </head>
 <body onload="initSettings();">
     <div class="dashboard-layout">
-        <aside class="sidebar">
-            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> QLCT_Hk</div>
-            <nav class="sidebar-menu">
-                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
-                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
-                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
-                <a href="/screens/chat.html" class="menu-item"><i class="material-icons">smart_toy</i> Trợ lý AI</a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="/screens/settings.html" class="menu-item active"><i class="material-icons">settings</i> Cài đặt</a>
-            </div>
-        </aside>
+        <aside id="sidebar-container" class="sidebar"></aside>
 
         <main class="main-content">
             <header class="topbar">
-                <h1 class="page-title">Cài đặt cá nhân</h1>
+                <h1 class="page-title" data-i18n="settings.title">Cài đặt cá nhân</h1>
             </header>
             
             <div class="content-area" style="max-width: 800px;">
@@ -48,7 +38,7 @@
                         </div>
                         <div class="avatar-overlay">
                             <i class="material-icons" style="font-size: 20px;">photo_camera</i>
-                            <span style="font-size: 10px; font-weight: bold; margin-top: 4px;">SỬA ẢNH</span>
+                            <span style="font-size: 10px; font-weight: bold; margin-top: 4px;" data-i18n="settings.edit_photo">SỬA ẢNH</span>
                         </div>
                     </div>
                     <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
@@ -59,7 +49,7 @@
                     </div>
                 </div>
 
-                <h3 style="margin: 32px 0 16px; font-size: 16px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; padding-left: 8px;">Tùy chọn hệ thống</h3>
+                <h3 style="margin: 32px 0 16px; font-size: 16px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; padding-left: 8px;" data-i18n="settings.system">Tùy chọn hệ thống</h3>
                 
                 <div class="card" style="padding: 0; overflow: hidden; border-radius: 20px;">
                     
@@ -67,15 +57,23 @@
                         <div style="width: 40px; height: 40px; border-radius: 12px; background: #1e293b; color: white; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
                             <i class="material-icons">brightness_6</i>
                         </div>
-                        <span style="flex: 1; font-weight: 500; font-size: 16px;">Giao diện Tối (Dark Mode)</span>
+                        <span style="flex: 1; font-weight: 500; font-size: 16px;" data-i18n="settings.dark_mode">Giao diện Tối (Dark Mode)</span>
                         <i class="material-icons" id="dark-icon" style="font-size: 32px; color: var(--border-color); transition: 0.3s;">toggle_off</i>
                     </div>
                     
-                    <a href="/screens/category_management.html" class="setting-item" style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border-color); text-decoration: none; color: inherit; transition: 0.2s;">
+                    <div class="setting-item" onclick="toggleLanguage()" style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: 0.2s;">
+<div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(245, 158, 11, 0.1); color: #f59e0b; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
+<i class="material-icons">language</i>
+</div>
+<span style="flex: 1; font-weight: 500; font-size: 16px;" data-i18n="settings.language">Ngôn ngữ (Language)</span>
+<span id="lang-icon" style="font-weight: 600; color: var(--primary-color);">🇻🇳 VI</span>
+</div>
+
+<a href="/screens/category_management.html" class="setting-item" style="display: flex; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border-color); text-decoration: none; color: inherit; transition: 0.2s;">
                         <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
                             <i class="material-icons">category</i>
                         </div>
-                        <span style="flex: 1; font-weight: 500; font-size: 16px;">Quản lý Danh mục</span>
+                        <span style="flex: 1; font-weight: 500; font-size: 16px;" data-i18n="settings.categories">Quản lý Danh mục</span>
                         <i class="material-icons" style="color: var(--text-muted);">chevron_right</i>
                     </a>
 
@@ -83,7 +81,7 @@
                         <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(67, 97, 238, 0.1); color: #4361ee; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
                             <i class="material-icons">manage_accounts</i>
                         </div>
-                        <span style="flex: 1; font-weight: 500; font-size: 16px;">Sửa mật khẩu & thông tin</span>
+                        <span style="flex: 1; font-weight: 500; font-size: 16px;" data-i18n="settings.edit_profile">Sửa mật khẩu & thông tin</span>
                         <i class="material-icons" style="color: var(--text-muted);">chevron_right</i>
                     </a>
 
@@ -91,7 +89,7 @@
                         <div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); color: #ef4444; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
                             <i class="material-icons">logout</i>
                         </div>
-                        <span style="flex: 1; font-weight: 600; font-size: 16px; color: #ef4444;">Đăng xuất</span>
+                        <span style="flex: 1; font-weight: 600; font-size: 16px; color: #ef4444;" data-i18n="settings.logout">Đăng xuất</span>
                     </div>
                 </div>
             </div>
@@ -151,12 +149,13 @@
         }
 
         function logout() {
-            if(confirm("Bạn có chắc chắn muốn đăng xuất?")) {
+            if(confirm(t('settings.logout_confirm'))) {
                 localStorage.removeItem('jwt_token');
                 localStorage.removeItem('user_info');
                 window.location.href = '/index.html';
             }
         }
     </script>
+<script src="/js/sidebar.js"></script>
 </body>
 </html>

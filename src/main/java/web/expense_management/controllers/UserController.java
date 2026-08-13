@@ -1,52 +1,42 @@
 package web.expense_management.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import web.expense_management.dtos.ProfileUpdateRequest;
 import web.expense_management.models.User;
-import web.expense_management.repositories.UserRepository;
+import web.expense_management.services.UserService;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private PasswordEncoder passwordEncoder;
-
-    private String getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        return currentUser.getId();
-    }
+    private final UserService userService;
 
     @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(@RequestBody ProfileUpdateRequest request) {
-        User user = userRepository.findById(getCurrentUserId()).orElseThrow();
-
-        // Kiểm tra mật khẩu hiện tại
-        if (request.getCurrentPassword() == null || !passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            return ResponseEntity.status(401).body(Map.of("message", "Mật khẩu hiện tại không chính xác"));
-        }
-
-        // Cập nhật thông tin cơ bản
-        if (request.getFullName() != null) user.setFullName(request.getFullName());
-        if (request.getPhone() != null) user.setPhone(request.getPhone());
-
-        // Đổi mật khẩu mới (nếu có)
-        if (request.getNewPassword() != null && !request.getNewPassword().isEmpty()) {
-            if (!request.getNewPassword().matches("^(?=.*[A-Za-z])(?=.*\\d).{6,}$")) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Mật khẩu mới phải có ít nhất 6 ký tự, bao gồm chữ và số"));
-            }
-            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        }
-
-        userRepository.save(user);
+    public ResponseEntity<?> updateProfile(@Valid @RequestBody ProfileUpdateRequest request) {
+        log.info("Cập nhật profile user");
+        User user = userService.updateProfile(request);
         return ResponseEntity.ok(Map.of("user", user));
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile() {
+        log.info("Lấy thông tin profile user");
+        User user = userService.getProfile();
+        return ResponseEntity.ok(Map.of("user", user));
+    }
+
+    @PostMapping("/avatar")
+    public ResponseEntity<?> uploadAvatar(@RequestBody Map<String, String> body) {
+        log.info("Cập nhật avatar user");
+        Map<String, String> response = userService.uploadAvatar(body.get("avatarUrl"));
+        return ResponseEntity.ok(response);
     }
 }

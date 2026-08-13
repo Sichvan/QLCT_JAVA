@@ -18,7 +18,7 @@ async function updateProfile() {
     // Nếu người dùng nhập mật khẩu mới, bắt buộc phải nhập mật khẩu cũ
     if (newPw) {
         if (!oldPw) {
-            alert("Vui lòng nhập mật khẩu hiện tại để xác nhận đổi mật khẩu!");
+            alert(t('account.err_req_old_pw') || 'Vui lòng nhập mật khẩu hiện tại để đổi mật khẩu mới!');
             return;
         }
         payload.currentPassword = oldPw;
@@ -39,13 +39,17 @@ async function updateProfile() {
         if (res.ok) {
             // Cập nhật lại thông tin dưới LocalStorage
             localStorage.setItem('user_info', JSON.stringify(data.user));
-            alert("Cập nhật thông tin thành công!");
+            alert(t('account.update_success') || 'Cập nhật thành công!');
             window.location.href = '/screens/settings.html';
         } else {
-            alert(data.message || "Cập nhật thất bại!");
+            let errorMsg = data.message;
+            if (errorMsg === 'Mật khẩu hiện tại không chính xác') {
+                errorMsg = t('account.err_wrong_pw') || errorMsg;
+            }
+            alert(errorMsg || t('account.update_fail') || 'Cập nhật thất bại');
         }
     } catch(e) {
         console.error(e);
-        alert("Lỗi kết nối máy chủ");
+        alert(t('account.err_server') || 'Lỗi kết nối!');
     }
 }

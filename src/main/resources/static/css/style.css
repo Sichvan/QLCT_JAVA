@@ -137,6 +137,7 @@ body.dark-mode {
 body.dark-mode .topbar { background: rgba(28, 28, 30, 0.85); }
 body.dark-mode .tx-icon-wrapper { background: #2c2c2e; }
 body.dark-mode .tx-item:hover { background: #2c2c2e; }
+body.dark-mode .btn-cancel { background: #3f3f46 !important; color: #f3f4f6 !important; }
 
 /* ANIMATION */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }

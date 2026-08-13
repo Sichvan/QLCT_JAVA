@@ -18,27 +18,65 @@ async function fetchWalletData() {
     } catch (err) { console.error(err); }
 }
 
-async function exportToExcel() {
-    try {
-        const res = await fetch('/api/transactions', { headers: { 'Authorization': `Bearer ${token}` } });
-        const data = await res.json();
-        
-        if (!data.transactions || data.transactions.length === 0) {
-            alert("Không có giao dịch nào để xuất!"); return;
+// ======= XUẤT DỮ LIỆU CSV QUA API BACKEND =======
+function openExportModal() {
+    document.getElementById('exportModal').classList.add('active');
+    document.getElementById('export-filter').value = 'all';
+    document.getElementById('export-date-group').style.display = 'none';
+}
+
+function closeExportModal() {
+    document.getElementById('exportModal').classList.remove('active');
+}
+
+function onFilterChange() {
+    const filter = document.getElementById('export-filter').value;
+    const dateGroup = document.getElementById('export-date-group');
+    const dateInput = document.getElementById('export-date');
+
+    if (filter === 'all') {
+        dateGroup.style.display = 'none';
+    } else {
+        dateGroup.style.display = 'block';
+        if (filter === 'day') {
+            dateInput.type = 'date';
+            dateInput.value = new Date().toISOString().split('T')[0];
+        } else if (filter === 'month') {
+            dateInput.type = 'month';
+            const now = new Date();
+            dateInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        } else if (filter === 'year') {
+            dateInput.type = 'number';
+            dateInput.value = new Date().getFullYear();
+            dateInput.min = 2020;
+            dateInput.max = 2030;
         }
+    }
+}
 
-        let csvContent = '\uFEFFNgày,Danh mục,Loại,Số tiền,Ghi chú\n';
-        data.transactions.forEach(tx => {
-            const date = new Date(tx.date).toLocaleDateString('vi-VN');
-            const type = tx.type === 'income' ? 'Thu nhập' : (tx.type === 'expense' ? 'Chi tiêu' : 'Vay/Nợ');
-            csvContent += `"${date}","${tx.categoryName || tx.category}","${type}","${tx.amount}","${tx.note || ''}"\n`;
-        });
+async function exportToExcel() {
+    const filter = document.getElementById('export-filter').value;
+    const dateInput = document.getElementById('export-date').value;
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    let url = `/api/export/csv?filter=${filter}`;
+    if (filter !== 'all' && dateInput) {
+        url += `&date=${dateInput}`;
+    }
+
+    try {
+        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!res.ok) {
+            alert("Lỗi khi xuất dữ liệu!"); return;
+        }
+        const blob = await res.blob();
+        if (blob.size <= 100) {
+            alert("Không có giao dịch nào trong khoảng thời gian đã chọn!"); return;
+        }
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `LichSuGiaoDich_${new Date().getTime()}.csv`;
+        link.download = `GiaoDich_${new Date().getTime()}.csv`;
         link.click();
+        closeExportModal();
     } catch(err) { alert("Lỗi khi xuất dữ liệu!"); }
 }
 

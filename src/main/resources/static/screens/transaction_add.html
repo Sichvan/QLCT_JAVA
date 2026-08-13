@@ -26,20 +26,41 @@
         .cat-item.selected { border-color: var(--primary-color); background: rgba(67, 97, 238, 0.08); }
         .cat-icon-box { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
         .cat-icon-box img { width: 100%; height: 100%; object-fit: contain; }
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Giao Dịch - QLCT_HK</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+    <style>
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;}
+        .form-control { width: 100%; padding: 14px 16px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 15px; outline: none; transition: 0.3s; background: var(--bg-color); color: var(--text-main);}
+        .form-control:focus { border-color: var(--primary-color); background: var(--card-bg); }
+        
+        .custom-tab-bar { display: flex; background: var(--border-color); border-radius: 14px; padding: 6px; margin-bottom: 24px;}
+        .tab-btn { flex: 1; padding: 12px; text-align: center; font-weight: 600; color: var(--text-main); cursor: pointer; border-radius: 10px; transition: 0.2s;}
+        .tab-btn.active { background: var(--primary-color); color: white; box-shadow: var(--shadow-sm);}
+        
+        .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; max-height: 220px; overflow-y: auto; padding: 4px; }
+        .category-grid::-webkit-scrollbar { width: 4px; }
+        .category-grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        
+        .cat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; border-radius: 16px; border: 2px solid transparent; cursor: pointer; transition: 0.2s; background: var(--bg-color); }
+        .cat-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); background: var(--card-bg); }
+        .cat-item.selected { border-color: var(--primary-color); background: rgba(67, 97, 238, 0.08); }
+        .cat-icon-box { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+        .cat-icon-box img { width: 100%; height: 100%; object-fit: contain; }
         .cat-name { font-size: 12px; font-weight: 500; text-align: center; color: var(--text-main); line-height: 1.2; }
     </style>
+<script src="/js/i18n.js"></script>
 </head>
 <body>
     <div class="dashboard-layout">
-        <aside class="sidebar">
-            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> QLCT_HK</div>
-            <nav class="sidebar-menu">
-                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
-                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
-                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
-            </nav>
-            <div class="sidebar-footer"><a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a></div>
-        </aside>
+        <aside id="sidebar-container" class="sidebar"></aside>
 
         <main class="main-content">
             <header class="topbar">
@@ -47,43 +68,43 @@
                     <div onclick="history.back()" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'">
                         <i class="material-icons">arrow_back</i>
                     </div>
-                    <h1 class="page-title">Thêm Giao Dịch</h1>
+                    <h1 class="page-title" data-i18n="tx.title">Thêm Giao Dịch</h1>
                 </div>
             </header>
 
             <div class="content-area" style="max-width: 600px;">
                 <div class="custom-tab-bar">
-                    <div class="tab-btn active" onclick="switchTab('expense')" id="tab-expense">Chi Tiêu</div>
-                    <div class="tab-btn" onclick="switchTab('income')" id="tab-income">Thu Nhập</div>
-                    <div class="tab-btn" onclick="switchTab('loan')" id="tab-loan">Vay / Nợ</div>
+                    <div class="tab-btn active" onclick="switchTab('expense')" id="tab-expense" data-i18n="tx.expense">Chi Tiêu</div>
+                    <div class="tab-btn" onclick="switchTab('income')" id="tab-income" data-i18n="tx.income">Thu Nhập</div>
+                    <div class="tab-btn" onclick="switchTab('loan')" id="tab-loan" data-i18n="tx.loan">Vay / Nợ</div>
                 </div>
 
                 <div class="card" style="padding: 32px; border-radius: 20px;">
                     
                     <div class="form-group">
-                        <label>Số tiền (VNĐ)</label>
-                        <input type="tel" id="tx-amount" class="form-control" placeholder="VD: 500.000" style="font-size: 28px; font-weight: bold; color: var(--primary-color); background: var(--card-bg);" onfocus="unformatCurrency(this)" onblur="formatCurrency(this)" autocomplete="off">
+                        <label data-i18n="tx.amount">Số tiền (VNĐ)</label>
+                        <input type="tel" id="tx-amount" class="form-control" data-i18n="tx.amount_placeholder" placeholder="VD: 500.000" style="font-size: 28px; font-weight: bold; color: var(--primary-color); background: var(--card-bg);" onfocus="unformatCurrency(this)" onblur="formatCurrency(this)" autocomplete="off">
                     </div>
                     
                     <div class="form-group">
-                        <label>Chọn Danh mục</label>
+                        <label data-i18n="tx.select_cat">Chọn danh mục</label>
                         <div class="category-grid" id="category-grid">
                             <p style="color: var(--text-muted); font-size: 13px;">Đang tải danh mục...</p>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label>Ngày giao dịch</label>
+                        <label data-i18n="tx.date">Ngày giao dịch</label>
                         <input type="date" id="tx-date" class="form-control">
                     </div>
                     
                     <div class="form-group">
-                        <label>Ghi chú</label>
-                        <input type="text" id="tx-note" class="form-control" placeholder="Chi tiết giao dịch (không bắt buộc)..." autocomplete="off">
+                        <label data-i18n="tx.note">Ghi chú</label>
+                        <input type="text" id="tx-note" class="form-control" data-i18n="tx.note_placeholder" placeholder="Chi tiết giao dịch (không bắt buộc)..." autocomplete="off">
                     </div>
 
                     <button class="btn-primary" style="width: 100%; justify-content: center; padding: 16px; font-size: 16px; margin-top: 12px;" onclick="submitTransaction()">
-                        <i class="material-icons">save</i> LƯU GIAO DỊCH
+                        <i class="material-icons">save</i> <span data-i18n="tx.save">LƯU GIAO DỊCH</span>
                     </button>
                     <p id="tx-msg" class="text-center" style="margin-top: 16px; font-size: 14px; color: var(--danger-color); font-weight: 500;"></p>
                 </div>
@@ -166,18 +187,20 @@
             const filtered = allCategories.filter(c => c.type === type);
             
             if(filtered.length === 0) {
-                grid.innerHTML = '<p style="color: var(--text-muted); font-size: 13px;">Chưa có danh mục nào.</p>';
+                grid.innerHTML = `<p style="color: var(--text-muted); font-size: 13px;">${t('tx.no_cat')}</p>`;
                 selectedCategory = null;
                 selectedCategoryName = null;
                 return;
             }
 
-            grid.innerHTML = filtered.map(c => `
-                <div class="cat-item" data-id="${c.icon || c.id}" data-name="${c.name}" onclick="selectCategory('${c.icon || c.id}', '${c.name}', this)">
+            grid.innerHTML = filtered.map(c => {
+                const displayName = typeof tCat === 'function' ? tCat(c.icon || c.id, c.name) : c.name;
+                return `
+                <div class="cat-item" data-id="${c.icon || c.id}" data-name="${displayName.replace(/'/g, "\\'")}" onclick="selectCategory('${c.icon || c.id}', '${displayName.replace(/'/g, "\\'")}', this)">
                     <div class="cat-icon-box"><img src="/assets/icons/${c.icon || c.id}.png" onerror="this.src='/assets/icons/other_expense.png'"></div>
-                    <div class="cat-name">${c.name}</div>
+                    <div class="cat-name">${displayName}</div>
                 </div>
-            `).join('');
+            `}).join('');
             
             // Tự động chọn danh mục đầu tiên cho nhanh
             const firstItem = grid.querySelector('.cat-item');
@@ -201,8 +224,8 @@
 
             msgBox.textContent = ''; 
 
-            if (amount <= 0) return msgBox.textContent = "Vui lòng nhập số tiền hợp lệ!";
-            if (!selectedCategory) return msgBox.textContent = "Vui lòng chọn 1 danh mục!";
+            if (amount <= 0) return msgBox.textContent = t('tx.error_amount');
+            if (!selectedCategory) return msgBox.textContent = t('tx.error_cat');
 
             const payload = {
                 type: currentType,
@@ -224,14 +247,15 @@
                     window.location.href = '/screens/home.html';
                 } else {
                     const data = await response.json();
-                    msgBox.textContent = data.message || "Có lỗi xảy ra!";
+                    msgBox.textContent = data.message || t('tx.error_general');
                 }
             } catch (error) {
-                msgBox.textContent = "Không thể kết nối máy chủ!";
+                msgBox.textContent = t('tx.error_server');
             }
         }
 
         loadCategories();
     </script>
+    <script src="/js/sidebar.js"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@ public class TransactionDTO {
     private String category;
     private String categoryName;
     private String note;
+    private String personName;
     private Date date;
 
     // 1. HÀM KHỞI TẠO RỖNG (Bắt buộc cho Spring Boot)
@@ -16,13 +17,14 @@ public class TransactionDTO {
     }
 
     // 2. HÀM KHỞI TẠO CÓ THAM SỐ (Để sửa lỗi ở TransactionController)
-    public TransactionDTO(String id, String type, double amount, String category, String categoryName, String note, Date date) {
+    public TransactionDTO(String id, String type, double amount, String category, String categoryName, String note, String personName, Date date) {
         this.id = id;
         this.type = type;
         this.amount = amount;
         this.category = category;
         this.categoryName = categoryName;
         this.note = note;
+        this.personName = personName;
         this.date = date;
     }
 
@@ -40,4 +42,6 @@ public class TransactionDTO {
     public void setNote(String note) { this.note = note; }
     public Date getDate() { return date; }
     public void setDate(Date date) { this.date = date; }
+    public String getPersonName() { return personName; }
+    public void setPersonName(String personName) { this.personName = personName; }
 }

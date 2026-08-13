@@ -29,63 +29,56 @@
         .toast-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         @media (min-width: 769px) { .toast-notification { bottom: 40px; left: calc(50% + 130px); } }
     </style>
+<script src="/js/i18n.js"></script>
 </head>
 <body>
     <div class="dashboard-layout">
-        <aside class="sidebar">
-            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> QLCT_HK</div>
-            <nav class="sidebar-menu">
-                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
-                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
-                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
-            </nav>
-            <div class="sidebar-footer"><a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a></div>
-        </aside>
+        <aside id="sidebar-container" class="sidebar"></aside>
 
         <main class="main-content">
             <header class="topbar">
                 <div style="display: flex; align-items: center; gap: 16px;">
                     <div onclick="window.location.href='/screens/wallet.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'"><i class="material-icons">arrow_back</i></div>
-                    <h1 class="page-title">Ngân sách</h1>
+                    <h1 class="page-title" data-i18n="budget.title">Ngân sách</h1>
                 </div>
             </header>
 
             <div class="content-area" style="max-width: 800px;">
                 <div class="flex-between" style="margin-bottom: 24px;">
-                    <h2 style="font-size: 20px; font-weight: 600;">Ngân sách tháng này</h2>
-                    <button class="btn-primary" onclick="openModal()"><i class="material-icons">add</i> Thêm mới</button>
+                    <h2 style="font-size: 20px; font-weight: 600;" data-i18n="budget.month_budget">Ngân sách tháng này</h2>
+                    <button class="btn-primary" onclick="openModal()"><i class="material-icons">add</i> <span data-i18n="budget.btn_add">Thêm mới</span></button>
                 </div>
-                <div id="budget-list"><p class="text-center" style="color: var(--text-muted);">Đang tải dữ liệu...</p></div>
+                <div id="budget-list"><p class="text-center" style="color: var(--text-muted);" data-i18n="budget.loading">Đang tải dữ liệu...</p></div>
             </div>
         </main>
     </div>
 
     <div id="toast-notification" class="toast-notification">
         <i class="material-icons" style="font-size: 20px;">error_outline</i>
-        <span>Cảnh báo: Bạn đã chi tiêu vượt quá một số ngân sách!</span>
+        <span data-i18n="budget.warning_toast">Cảnh báo: Bạn đã chi tiêu vượt quá một số ngân sách!</span>
     </div>
 
     <div class="modal-overlay" id="budgetModal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 24px; font-size: 20px;">Thiết lập ngân sách</h2>
+            <h2 style="margin-bottom: 24px; font-size: 20px;" data-i18n="budget.modal_title">Thiết lập ngân sách</h2>
             <div class="form-group">
-                <label>Danh mục</label>
+                <label data-i18n="budget.cat">Danh mục</label>
                 <select id="budget-cat" class="form-control" style="background-image: none;">
-                    <option value="eating">Ăn uống</option>
-                    <option value="shopping">Mua sắm</option>
-                    <option value="transport">Di chuyển</option>
-                    <option value="education">Học tập</option>
-                    <option value="health">Sức khỏe</option>
-                    <option value="other_expense">Chi tiêu khác</option>
+                    <option value="eating" data-i18n="cat.eating">Ăn uống</option>
+                    <option value="shopping" data-i18n="cat.shopping">Mua sắm</option>
+                    <option value="transport" data-i18n="cat.transport">Di chuyển</option>
+                    <option value="education" data-i18n="cat.education">Học tập</option>
+                    <option value="health" data-i18n="cat.health">Sức khỏe</option>
+                    <option value="other_expense" data-i18n="cat.other_expense">Chi tiêu khác</option>
                 </select>
             </div>
             <div class="form-group">
-                <label>Số tiền hạn mức (VNĐ)</label>
-                <input type="tel" id="budget-limit" class="form-control" placeholder="VD: 5.000.000" style="font-size: 20px; font-weight: bold; color: var(--primary-color);" onfocus="unformatCurrency(this)" onblur="formatCurrency(this)" autocomplete="off">
+                <label data-i18n="budget.amount">Số tiền hạn mức (VNĐ)</label>
+                <input type="tel" id="budget-limit" class="form-control" data-i18n="budget.amount_placeholder" placeholder="VD: 5.000.000" style="font-size: 20px; font-weight: bold; color: var(--primary-color);" onfocus="unformatCurrency(this)" onblur="formatCurrency(this)" autocomplete="off">
             </div>
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">HỦY</button>
-                <button class="btn-submit" onclick="submitBudget()">LƯU LẠI</button>
+                <button class="btn-cancel" onclick="closeModal()" data-i18n="budget.btn_cancel">HỦY</button>
+                <button class="btn-submit" onclick="submitBudget()" data-i18n="budget.btn_save">LƯU LẠI</button>
             </div>
         </div>
     </div>
@@ -121,7 +114,7 @@
                 const listDiv = document.getElementById('budget-list');
                 
                 if (budgets.length === 0) {
-                    listDiv.innerHTML = `<div class="text-center" style="color: grey; margin-top: 40px;"><i class="material-icons" style="font-size: 64px; opacity: 0.5;">account_balance_wallet</i><p style="margin-top: 10px;">Chưa có ngân sách nào được thiết lập</p></div>`;
+                    listDiv.innerHTML = `<div class="text-center" style="color: grey; margin-top: 40px;"><i class="material-icons" style="font-size: 64px; opacity: 0.5;">account_balance_wallet</i><p style="margin-top: 10px;">${t('budget.no_budget')}</p></div>`;
                     return;
                 }
 
@@ -141,7 +134,7 @@
                     return `
                         <div class="card">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="bold" style="font-size: 16px;">${budget.categoryName || budget.category}</span>
+                                <span class="bold" style="font-size: 16px;">${tCat(budget.category, budget.categoryName)}</span>
                                 <div style="display: flex; gap: 12px; align-items: center;">
                                     <i class="material-icons" style="color: var(--primary-color); cursor: pointer; font-size: 20px;" onclick="editBudget('${budget.category}', ${budget.limitAmount})">edit</i>
                                     <i class="material-icons" style="color: var(--danger-color); cursor: pointer; font-size: 20px;" onclick="deleteBudget('${budget.id}')">delete</i>
@@ -151,10 +144,10 @@
                                 <div class="progress-fill ${colorClass}" style="width: ${percent}%;"></div>
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                                <span style="color: ${isOver ? 'var(--danger-color)' : 'var(--success-color)'}; font-weight: bold;">Đã chi: ${formatCurrencyText(budget.spentAmount)}</span>
-                                <span class="bold">Hạn mức: ${formatCurrencyText(budget.limitAmount)}</span>
+                                <span style="color: ${isOver ? 'var(--danger-color)' : 'var(--success-color)'}; font-weight: bold;">${t('budget.spent')}: ${formatCurrencyText(budget.spentAmount)}</span>
+                                <span class="bold">${t('budget.limit')}: ${formatCurrencyText(budget.limitAmount)}</span>
                             </div>
-                            ${isOver ? '<div style="background: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 8px; margin-top: 12px; color: var(--danger-color); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="material-icons" style="font-size: 16px;">warning</i> Đã vượt ngân sách tháng này!</div>' : ''}
+                            ${isOver ? `<div style="background: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 8px; margin-top: 12px; color: var(--danger-color); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="material-icons" style="font-size: 16px;">warning</i> ${t('budget.exceeded')}</div>` : ''}
                         </div>
                     `;
                 }).join('');
@@ -165,7 +158,7 @@
         }
 
         async function deleteBudget(id) {
-            if (confirm("Bạn có chắc muốn xóa ngân sách này?")) {
+            if (confirm(t('budget.confirm_delete'))) {
                 await fetch(`/api/budgets/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
                 fetchBudgets(); 
             }
@@ -193,7 +186,7 @@
             const catName = catSelect.options[catSelect.selectedIndex].text;
             const limit = getRawNumber(document.getElementById('budget-limit').value);
             
-            if (limit <= 0) return alert("Số tiền không hợp lệ!");
+            if (limit <= 0) return alert(t('tx.error_amount'));
             
             try {
                 await fetch('/api/budgets', {
@@ -203,10 +196,11 @@
                 });
                 closeModal();
                 fetchBudgets(); 
-            } catch (e) { alert("Lỗi kết nối!"); }
+            } catch (e) { alert(t('cat_manage.server_error')); }
         }
 
         fetchBudgets();
     </script>
+<script src="/js/sidebar.js"></script>
 </body>
 </html>

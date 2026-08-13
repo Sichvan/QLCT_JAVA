@@ -15,7 +15,7 @@ async function fetchRecurring() {
             listDiv.innerHTML = `
                 <div class="text-center" style="color: grey; margin-top: 40px;">
                     <i class="material-icons" style="font-size: 64px; opacity: 0.5;">event_repeat</i>
-                    <p style="margin-top: 10px;">Chưa có thiết lập định kỳ nào</p>
+                    <p style="margin-top: 10px;">${t('recurring.no_recurring')}</p>
                 </div>
             `;
             return;
@@ -25,6 +25,7 @@ async function fetchRecurring() {
             const isExpense = item.type === 'expense';
             const color = isExpense ? 'red' : 'green';
             const sign = isExpense ? '-' : '+';
+            const translatedCatName = tCat(item.category, item.categoryName);
 
             listDiv.innerHTML += `
                 <div class="card" style="display: flex; align-items: center;">
@@ -32,8 +33,8 @@ async function fetchRecurring() {
                         autorenew
                     </i>
                     <div style="flex: 1;">
-                        <div class="bold" style="font-size: 16px;">${item.categoryName || item.category}</div>
-                        <div style="font-size: 12px; color: grey;">Ngày ${item.dayOfMonth} hàng tháng • ${item.note || ''}</div>
+                        <div class="bold" style="font-size: 16px;">${translatedCatName}</div>
+                        <div style="font-size: 12px; color: grey;">${t('recurring.monthly_day').replace('{day}', item.dayOfMonth)} ${item.note ? '• ' + item.note : ''}</div>
                     </div>
                     <div style="text-align: right;">
                         <div class="bold" style="color: ${color}; font-size: 15px;">${sign}${formatCurrency(item.amount)}</div>
@@ -46,28 +47,10 @@ async function fetchRecurring() {
 }
 
 async function deleteRecurring(id) {
-    if (confirm("Bạn có chắc muốn xóa giao dịch định kỳ này?")) {
+    if (confirm(t('recurring.confirm_delete'))) {
         await fetch(`/api/recurring/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         fetchRecurring();
     }
-}
-
-// Thay alert trong recurring_page.html bằng hàm addRecurring()
-async function addRecurring() {
-    const type = prompt("Nhập loại giao dịch (gõ: expense HOẶC income):", "expense");
-    const amount = prompt("Số tiền định kỳ hàng tháng:");
-    const day = prompt("Ngày thực hiện trong tháng (1-31):", "1");
-    if (!amount || !day) return;
-
-    await fetch('/api/recurring', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            type: type, amount: parseInt(amount), dayOfMonth: parseInt(day), 
-            category: 'category', categoryName: 'Định kỳ', note: 'Thêm nhanh'
-        })
-    });
-    fetchRecurring();
 }
 
 fetchRecurring();

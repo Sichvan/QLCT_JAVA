@@ -1,6 +1,8 @@
 package web.expense_management.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -19,19 +21,18 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private JwtUtils jwtUtils; 
-    @Autowired private EmailService emailService;
-    @Autowired private OtpService otpService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtils jwtUtils; 
+    private final EmailService emailService;
+    private final OtpService otpService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        if (request.getUsername() == null || request.getPassword() == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Vui lòng nhập đầy đủ thông tin"));
-        }
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
 
         if (userRepository.existsByUsername(request.getUsername())) {
             return ResponseEntity.badRequest().body(Map.of("message", "Email này đã được sử dụng"));
@@ -82,7 +83,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         Optional<User> userOpt = userRepository.findByUsername(request.getUsername().toLowerCase().trim());
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -121,8 +122,8 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("message", "Mã OTP không hợp lệ hoặc đã hết hạn"));
         }
 
-        if (newPassword == null || !newPassword.matches("^(?=.*[A-Za-z])(?=.*\\d).{6,}$")) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Mật khẩu mới phải có ít nhất 6 ký tự, bao gồm chữ và số"));
+        if (newPassword == null || !newPassword.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$")) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Mật khẩu mới phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường và số"));
         }
 
         User user = userRepository.findByUsername(email).orElseThrow();

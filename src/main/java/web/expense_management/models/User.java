@@ -17,6 +17,7 @@ public class User {
     private String phone;
     private double balance = 0.0;
     private String role = "user"; // 'user' hoặc 'admin'
+    private String avatarUrl; // Avatar base64 lưu trên server
     
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -76,5 +77,11 @@ public class User {
     }
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

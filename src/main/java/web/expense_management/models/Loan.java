@@ -15,6 +15,7 @@ public class Loan {
     private String category;
     private String categoryName;
     private String note;
+    private String personName; // Tên người vay/cho vay
     private Date date;
     private boolean isCompleted = false;
     public String getId() {
@@ -64,5 +65,11 @@ public class Loan {
     }
     public void setCompleted(boolean isCompleted) {
         this.isCompleted = isCompleted;
+    }
+    public String getPersonName() {
+        return personName;
+    }
+    public void setPersonName(String personName) {
+        this.personName = personName;
     }
 }

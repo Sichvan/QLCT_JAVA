@@ -15,7 +15,7 @@ async function fetchGoals() {
             listDiv.innerHTML = `
                 <div class="text-center" style="color: grey; margin-top: 40px;">
                     <i class="material-icons" style="font-size: 64px; opacity: 0.5;">flag</i>
-                    <p style="margin-top: 10px;">Chưa có mục tiêu nào</p>
+                    <p style="margin-top: 10px;">${t('goal.no_goal')}</p>
                 </div>
             `;
             return;
@@ -30,7 +30,7 @@ async function fetchGoals() {
             const icon = isCompleted ? 'emoji_events' : 'savings';
 
             listDiv.innerHTML += `
-                <div class="card" style="cursor: pointer;" onclick="depositGoal('${goal.id}', '${goal.name}')">
+                <div class="card" style="cursor: pointer;" onclick="depositGoal('${goal.id}', '${goal.name.replace(/'/g, "\\'")}')">
                     <div style="display: flex; align-items: center;">
                         <div style="background: ${color}20; padding: 10px; border-radius: 50%; margin-right: 12px; display: flex; justify-content: center; align-items: center;">
                             <i class="material-icons" style="color: ${color};">${icon}</i>
@@ -38,7 +38,7 @@ async function fetchGoals() {
                         <div style="flex: 1;">
                             <div class="bold" style="font-size: 16px;">${goal.name}</div>
                             <div style="font-size: 12px; color: ${isCompleted ? 'green' : 'grey'};">
-                                ${isCompleted ? 'Đã hoàn thành!' : 'Nhấn vào để nạp tiền'}
+                                ${isCompleted ? t('goal.completed') : t('goal.click_to_deposit')}
                             </div>
                         </div>
                         <i class="material-icons" style="color: red; cursor: pointer;" onclick="event.stopPropagation(); deleteGoal('${goal.id}')">delete</i>
@@ -59,19 +59,20 @@ async function fetchGoals() {
 }
 
 async function deleteGoal(id) {
-    if (confirm("Bạn có chắc muốn xóa mục tiêu này?")) {
+    if (confirm(t('goal.confirm_delete'))) {
         await fetch(`/api/goals/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
         fetchGoals();
     }
 }
 
 async function depositGoal(id, name) {
-    const amountStr = prompt(`Nhập số tiền muốn nạp vào mục tiêu "${name}":\n(VD: 50000)`);
+    const promptText = t('goal.deposit_prompt').replace('{name}', name);
+    const amountStr = prompt(promptText);
     if (!amountStr) return;
     
     const amount = parseInt(amountStr);
     if (isNaN(amount) || amount <= 0) {
-        alert("Số tiền không hợp lệ!"); return;
+        alert(t('goal.invalid_amount')); return;
     }
 
     try {
@@ -81,23 +82,8 @@ async function depositGoal(id, name) {
             body: JSON.stringify({ amount: amount })
         });
         if (res.ok) fetchGoals();
-        else alert("Lỗi nạp tiền!");
+        else alert(t('goal.deposit_error'));
     } catch (err) { console.error(err); }
-}
-
-// Thay alert trong goal_page.html bằng hàm addGoal()
-async function addGoal() {
-    const name = prompt("Nhập tên mục tiêu (VD: Mua xe máy):");
-    if (!name) return;
-    const target = prompt("Nhập số tiền mục tiêu (VD: 50000000):");
-    if (!target || isNaN(target)) return alert("Số tiền không hợp lệ!");
-
-    await fetch('/api/goals', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, targetAmount: parseInt(target) })
-    });
-    fetchGoals();
 }
 
 fetchGoals();

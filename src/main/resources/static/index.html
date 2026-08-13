@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QLCT_HK Quản Lý Chi Tiêu</title>
+    <title data-i18n="auth.login">Đăng Nhập - QLCT_HK</title>
     <meta property="og:title" content="QLCT_HK Quản Lý Chi Tiêu">
     <meta property="og:description" content="Ứng dụng quản lý tài chính cá nhân thông minh">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -91,48 +91,49 @@
         <div class="logo-container">
             <i class="material-icons">account_balance_wallet</i>
         </div>
-        <h2 id="form-title">Đăng Nhập</h2>
+        <h2 id="form-title" data-i18n="auth.login">Đăng Nhập</h2>
         
         <form id="auth-form">
             <div id="register-fields" style="display: none;">
                 <div class="input-group">
-                    <label>Họ và tên</label>
-                    <input type="text" id="fullName" placeholder="VD: Nguyễn Văn A">
+                    <label data-i18n="auth.fullname">Họ và tên</label>
+                    <input type="text" id="fullName" placeholder="VD: Nguyễn Văn A" data-i18n="auth.fullname">
                 </div>
                 <div class="input-group">
-                    <label>Số điện thoại</label>
-                    <input type="text" id="phone" placeholder="VD: 0987654321">
+                    <label data-i18n="auth.phone">Số điện thoại</label>
+                    <input type="text" id="phone" placeholder="VD: 0987654321" data-i18n="auth.phone">
                 </div>
             </div>
 
             <div class="input-group">
-                <label>Email</label>
-                <input type="email" id="email" required placeholder="example@gmail.com">
+                <label data-i18n="auth.email">Email</label>
+                <input type="email" id="email" required placeholder="example@gmail.com" data-i18n="auth.email">
             </div>
             
             <div class="input-group">
-                <label>Mật khẩu</label>
-                <input type="password" id="password" required placeholder="••••••••">
+                <label data-i18n="auth.password">Mật khẩu</label>
+                <input type="password" id="password" required placeholder="••••••••" data-i18n="auth.password">
                 <span class="material-icons toggle-password" onclick="togglePassword('password', this)">visibility_off</span>
             </div>
 
             <div class="input-group" id="confirm-password-group" style="display: none;">
-                <label>Xác nhận mật khẩu</label>
-                <input type="password" id="confirmPassword" placeholder="••••••••">
+                <label data-i18n="auth.confirm_pw">Xác nhận mật khẩu</label>
+                <input type="password" id="confirmPassword" placeholder="••••••••" data-i18n="auth.confirm_pw">
                 <span class="material-icons toggle-password" onclick="togglePassword('confirmPassword', this)">visibility_off</span>
             </div>
 
             <p id="error-message"></p>
 
-            <button type="submit" id="submit-btn"><i class="material-icons" style="font-size: 20px;">login</i> Đăng Nhập</button>
+            <button type="submit" id="submit-btn"><i class="material-icons" style="font-size: 20px;">login</i> <span data-i18n="auth.login">Đăng Nhập</span></button>
         </form>
 
-        <p class="toggle-text">
-            <span id="toggle-msg">Chưa có tài khoản?</span> 
-            <a href="#" id="toggle-link">Đăng ký ngay</a>
-        </p>
+        <div class="toggle-form">
+            <span id="toggle-msg" data-i18n="auth.no_account">Chưa có tài khoản?</span> 
+            <a href="#" id="toggle-link" data-i18n="auth.register_now">Đăng ký ngay</a>
+        </div>
     </div>
 
+    <script src="/js/i18n.js"></script>
     <script src="/js/auth.js"></script>
 </body>
 </html>

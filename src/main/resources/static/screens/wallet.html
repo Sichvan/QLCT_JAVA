@@ -3,31 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ví của tôi - QLCT_Hk</title>
+    <title data-i18n="wallet.title">Ví của tôi - QLCT_Hk</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script>if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');</script>
+<script src="/js/i18n.js"></script>
 </head>
 <body>
     <div class="dashboard-layout">
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <i class="material-icons">account_balance_wallet</i> QLCT_Hk
-            </div>
-            <nav class="sidebar-menu">
-                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
-                <a href="/screens/wallet.html" class="menu-item active"><i class="material-icons">account_balance</i> Ví của tôi</a>
-                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
-                <a href="/screens/chat.html" class="menu-item"><i class="material-icons">smart_toy</i> Trợ lý AI</a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="/screens/settings.html" class="menu-item"><i class="material-icons">settings</i> Cài đặt</a>
-            </div>
-        </aside>
+        <aside id="sidebar-container" class="sidebar"></aside>
 
         <main class="main-content">
             <header class="topbar">
-                <h1 class="page-title">Ví của tôi</h1>
+                <h1 class="page-title" data-i18n="wallet.title">Ví của tôi</h1>
                 <div class="user-profile" onclick="window.location.href='/screens/settings.html'" style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
                     <span id="header-user-name" style="font-weight: 600; color: var(--text-main); font-size: 15px;">Người dùng</span>
                     <div id="header-avatar" style="width: 44px; height: 44px; border-radius: 50%; background-color: var(--primary-color); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; color: white; box-shadow: var(--shadow-sm);">
@@ -38,73 +26,73 @@
 
             <div class="content-area">
                 <div class="card gradient-card text-center" style="padding: 40px 24px; border-radius: 24px;">
-                    <div class="stat-label" style="color: rgba(255,255,255,0.85); font-size: 14px;">TỔNG TÀI SẢN</div>
+                    <div class="stat-label" style="color: rgba(255,255,255,0.85); font-size: 14px;" data-i18n="wallet.total_assets">TỔNG TÀI SẢN</div>
                     <div class="stat-value" id="wallet-balance" style="font-size: 44px; margin: 16px 0; font-weight: 700;">0 ₫</div>
                     
                     <div class="flex-between" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 24px; margin-top: 24px;">
                         <div style="text-align: left; flex: 1;">
                             <span style="font-size: 13px; color: rgba(255,255,255,0.85); text-transform: uppercase; font-weight: 600;">
-                                <i class="material-icons" style="font-size: 16px; vertical-align: bottom;">arrow_upward</i> Cho vay
+                                <i class="material-icons" style="font-size: 16px; vertical-align: bottom;">arrow_upward</i> <span data-i18n="wallet.lending">Cho vay</span>
                             </span>
                             <div id="wallet-lending" class="bold" style="font-size: 20px; margin-top: 6px;">0 ₫</div>
                         </div>
                         <div style="width: 1px; height: 40px; background: rgba(255,255,255,0.3);"></div>
                         <div style="text-align: right; flex: 1;">
                             <span style="font-size: 13px; color: rgba(255,255,255,0.85); text-transform: uppercase; font-weight: 600;">
-                                Đang nợ <i class="material-icons" style="font-size: 16px; vertical-align: bottom;">arrow_downward</i>
+                                <span data-i18n="wallet.borrowing">Đang nợ</span> <i class="material-icons" style="font-size: 16px; vertical-align: bottom;">arrow_downward</i>
                             </span>
                             <div id="wallet-borrowing" class="bold" style="font-size: 20px; margin-top: 6px;">0 ₫</div>
                         </div>
                     </div>
                 </div>
 
-                <h2 style="font-size: 20px; font-weight: 600; margin: 32px 0 20px; color: var(--text-main);">Tiện ích</h2>
+                <h2 style="font-size: 20px; font-weight: 600; margin: 32px 0 20px; color: var(--text-main);" data-i18n="wallet.utilities">Tiện ích</h2>
                 
                 <div class="grid-cards" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px;">
                     <a href="/screens/budget_page.html" class="card text-center" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; cursor: pointer;">
                         <div style="width: 64px; height: 64px; border-radius: 20px; background: rgba(147, 51, 234, 0.1); display: flex; align-items: center; justify-content: center;">
                             <i class="material-icons" style="color: #9333ea; font-size: 32px;">pie_chart</i>
                         </div>
-                        <span class="bold" style="font-size: 15px;">Ngân sách</span>
+                        <span class="bold" style="font-size: 15px;" data-i18n="wallet.budget">Ngân sách</span>
                     </a>
                     
                     <a href="/screens/goal_page.html" class="card text-center" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; cursor: pointer;">
                         <div style="width: 64px; height: 64px; border-radius: 20px; background: rgba(20, 184, 166, 0.1); display: flex; align-items: center; justify-content: center;">
                             <i class="material-icons" style="color: #14b8a6; font-size: 32px;">flag</i>
                         </div>
-                        <span class="bold" style="font-size: 15px;">Mục tiêu</span>
+                        <span class="bold" style="font-size: 15px;" data-i18n="wallet.goal">Mục tiêu</span>
                     </a>
                     
-                    <a href="#" onclick="exportToExcel(); return false;" class="card text-center" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; cursor: pointer;">
+                    <a href="#" onclick="openExportModal(); return false;" class="card text-center" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; cursor: pointer;">
                         <div style="width: 64px; height: 64px; border-radius: 20px; background: rgba(249, 115, 22, 0.1); display: flex; align-items: center; justify-content: center;">
                             <i class="material-icons" style="color: #f97316; font-size: 32px;">cloud_download</i>
                         </div>
-                        <span class="bold" style="font-size: 15px;">Xuất dữ liệu</span>
+                        <span class="bold" style="font-size: 15px;" data-i18n="wallet.export">Xuất dữ liệu</span>
                     </a>
                     
                     <a href="/screens/recurring_page.html" class="card text-center" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 24px 16px; cursor: pointer;">
                         <div style="width: 64px; height: 64px; border-radius: 20px; background: rgba(79, 70, 229, 0.1); display: flex; align-items: center; justify-content: center;">
                             <i class="material-icons" style="color: #4f46e5; font-size: 32px;">event_repeat</i>
                         </div>
-                        <span class="bold" style="font-size: 15px;">Định kỳ</span>
+                        <span class="bold" style="font-size: 15px;" data-i18n="wallet.recurring">Định kỳ</span>
                     </a>
                 </div>
             </div>
         </main>
 
         <nav class="bottom-nav">
-            <a href="/screens/home.html" class="nav-item"><i class="material-icons">home</i><span>Trang chủ</span></a>
-            <a href="/screens/wallet.html" class="nav-item active"><i class="material-icons">account_balance_wallet</i><span>Ví</span></a>
+            <a href="/screens/home.html" class="nav-item"><i class="material-icons">home</i><span data-i18n="nav.home">Trang chủ</span></a>
+            <a href="/screens/wallet.html" class="nav-item active"><i class="material-icons">account_balance_wallet</i><span data-i18n="nav.wallet">Ví</span></a>
            <a href="/screens/chat.html" class="nav-item" style="position: relative;">
                 <div class="fab-mobile"><i class="material-icons" style="font-size: 28px;">smart_toy</i></div>
                 <span style="opacity: 0;">AI</span>
             </a> 
-            <a href="/screens/stats.html" class="nav-item"><i class="material-icons">pie_chart</i><span>Thống kê</span></a>
-            <a href="/screens/settings.html" class="nav-item"><i class="material-icons">person</i><span>Cá nhân</span></a>
+            <a href="/screens/stats.html" class="nav-item"><i class="material-icons">pie_chart</i><span data-i18n="nav.stats">Thống kê</span></a>
+            <a href="/screens/settings.html" class="nav-item"><i class="material-icons">person</i><span data-i18n="nav.personal">Cá nhân</span></a>
         </nav>
     </div>
     
-    <script src="/js/wallet.js"></script>
+        <script src="/js/wallet.js"></script>
     <script>
         // SCRIPT ĐỂ TẢI TÊN VÀ AVATAR KHI VÀO TRANG VÍ
         document.addEventListener('DOMContentLoaded', () => {
@@ -121,5 +109,41 @@
             }
         });
     </script>
+
+    <!-- MODAL XUẤT DỮ LIỆU -->
+    <div class="modal-overlay" id="exportModal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:center;z-index:1000;">
+        <div style="background:var(--card-bg);width:90%;max-width:400px;border-radius:24px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,0.2);">
+            <h2 style="margin-bottom:24px;font-size:20px;color:var(--text-main);"><i class="material-icons" style="vertical-align:middle;margin-right:8px;color:#f97316;">cloud_download</i><span data-i18n="wallet.export_title">Xuất dữ liệu CSV</span></h2>
+            <div style="margin-bottom:20px;">
+                <label style="display:block;margin-bottom:8px;font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;" data-i18n="wallet.export_type">Kiểu xuất</label>
+                <select id="export-filter" onchange="onFilterChange()" style="width:100%;padding:14px 16px;border:2px solid var(--border-color);border-radius:12px;font-size:15px;background:var(--bg-color);color:var(--text-main);outline:none;">
+                    <option value="all" data-i18n="wallet.export_all">Tất cả giao dịch</option>
+                    <option value="day" data-i18n="wallet.export_day">Theo ngày</option>
+                    <option value="month" data-i18n="wallet.export_month">Theo tháng</option>
+                    <option value="year" data-i18n="wallet.export_year">Theo năm</option>
+                </select>
+            </div>
+            <div id="export-date-group" style="margin-bottom:20px;display:none;">
+                <label style="display:block;margin-bottom:8px;font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;" data-i18n="wallet.export_time">Chọn thời gian</label>
+                <input type="date" id="export-date" style="width:100%;padding:14px 16px;border:2px solid var(--border-color);border-radius:12px;font-size:15px;background:var(--bg-color);color:var(--text-main);outline:none;">
+            </div>
+            <div style="display:flex;gap:12px;margin-top:24px;">
+                <button onclick="closeExportModal()" style="flex:1;padding:14px;border-radius:12px;border:none;background:var(--border-color);color:var(--text-main);font-weight:600;cursor:pointer;" data-i18n="wallet.export_cancel">HỦY</button>
+                <button onclick="exportToExcel()" style="flex:1;padding:14px;border-radius:12px;border:none;background:#f97316;color:white;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><i class="material-icons" style="font-size:18px;">download</i><span data-i18n="wallet.export_download">TẢI CSV</span></button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Script để xử lý modal show/hide
+        const exportModalEl = document.getElementById('exportModal');
+        if (exportModalEl) {
+            exportModalEl.addEventListener('click', function(e) { if (e.target === this) closeExportModal(); });
+        }
+        // Override modal active style
+        const style = document.createElement('style');
+        style.textContent = '.modal-overlay.active { display: flex !important; }';
+        document.head.appendChild(style);
+    </script>
+<script src="/js/sidebar.js"></script>
 </body>
 </html>

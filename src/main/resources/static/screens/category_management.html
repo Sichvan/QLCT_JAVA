@@ -23,21 +23,11 @@
         .icon-option.selected { border-color: var(--primary-color); background: rgba(67, 97, 238, 0.1); box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2); }
         .icon-option img { width: 32px; height: 32px; object-fit: contain; }
     </style>
+<script src="/js/i18n.js"></script>
 </head>
 <body>
     <div class="dashboard-layout">
-        <aside class="sidebar">
-            <div class="sidebar-logo"><i class="material-icons">account_balance_wallet</i> QLCT_HK</div>
-            <nav class="sidebar-menu">
-                <a href="/screens/home.html" class="menu-item"><i class="material-icons">dashboard</i> Tổng quan</a>
-                <a href="/screens/wallet.html" class="menu-item"><i class="material-icons">account_balance</i> Ví của tôi</a>
-                <a href="/screens/stats.html" class="menu-item"><i class="material-icons">pie_chart</i> Thống kê</a>
-                <a href="/screens/chat.html" class="menu-item"><i class="material-icons">smart_toy</i> Trợ lý AI</a>
-            </nav>
-            <div class="sidebar-footer">
-                <a href="/screens/settings.html" class="menu-item active"><i class="material-icons">settings</i> Cài đặt</a>
-            </div>
-        </aside>
+        <aside id="sidebar-container" class="sidebar"></aside>
 
         <main class="main-content">
             <header class="topbar">
@@ -45,44 +35,44 @@
                     <div onclick="window.location.href='/screens/settings.html'" style="width: 40px; height: 40px; border-radius: 50%; background: var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='var(--primary-color)'; this.style.color='white'" onmouseout="this.style.background='var(--border-color)'; this.style.color='var(--text-main)'">
                         <i class="material-icons">arrow_back</i>
                     </div>
-                    <h1 class="page-title">Quản lý Danh mục</h1>
+                    <h1 class="page-title" data-i18n="cat_manage.title">Quản lý Danh mục</h1>
                 </div>
             </header>
 
             <div class="content-area" style="max-width: 800px;">
                 <div class="card" style="padding: 32px; border-radius: 20px;" id="category-form-card">
                     <div class="flex-between" style="margin-bottom: 24px;">
-                        <h2 id="form-heading" style="font-size: 18px; font-weight: 600; color: var(--text-main);">Thêm Danh Mục Mới</h2>
-                        <button id="cancel-edit-btn" style="display: none; background: none; border: none; color: var(--danger-color); font-weight: 600; cursor: pointer; font-size: 14px;" onclick="cancelEdit()">HỦY SỬA</button>
+                        <h2 id="form-heading" style="font-size: 18px; font-weight: 600; color: var(--text-main);" data-i18n="cat_manage.add_title">Thêm Danh Mục Mới</h2>
+                        <button id="cancel-edit-btn" style="display: none; background: none; border: none; color: var(--danger-color); font-weight: 600; cursor: pointer; font-size: 14px;" onclick="cancelEdit()" data-i18n="cat_manage.cancel_edit">HỦY SỬA</button>
                     </div>
                     
                     <div class="form-group">
-                        <label>Tên danh mục</label>
-                        <input type="text" id="cat-name" class="form-control" placeholder="VD: Mua sắm, Lương...">
+                        <label data-i18n="cat_manage.name_label">TÊN DANH MỤC</label>
+                        <input type="text" id="cat-name" class="form-control" data-i18n="cat_manage.name_placeholder" placeholder="VD: Mua sắm, Lương...">
                     </div>
                     
                     <div class="form-group">
-                        <label>Loại giao dịch <span id="type-note" style="display: none; color: var(--warning-color); font-size: 11px; text-transform: none;">(Không thể đổi loại khi sửa)</span></label>
+                        <label><span data-i18n="cat_manage.type_label">Loại giao dịch</span> <span id="type-note" style="display: none; color: var(--warning-color); font-size: 11px; text-transform: none;" data-i18n="cat_manage.type_note">(Không thể đổi loại khi sửa)</span></label>
                         <select id="cat-type" class="form-control">
-                            <option value="expense">Khoản Chi</option>
-                            <option value="income">Khoản Thu</option>
+                            <option value="expense" data-i18n="cat_manage.type_expense">Khoản Chi</option>
+                            <option value="income" data-i18n="cat_manage.type_income">Khoản Thu</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Chọn biểu tượng</label>
+                        <label data-i18n="cat_manage.icon_label">Chọn biểu tượng</label>
                         <div class="icon-grid" id="icon-picker"></div>
                         <input type="hidden" id="cat-icon" value="other_expense"> 
                     </div>
 
                     <button id="submit-cat-btn" class="btn-primary" style="width: 100%; justify-content: center; padding: 16px; margin-top: 12px; font-size: 16px;" onclick="saveCategory()">
-                        <i class="material-icons" id="submit-icon">add_circle</i> <span id="submit-text">THÊM DANH MỤC MỚI</span>
+                        <i class="material-icons" id="submit-icon">add_circle</i> <span id="submit-text" data-i18n="cat_manage.btn_add">THÊM DANH MỤC MỚI</span>
                     </button>
                 </div>
 
-                <h2 style="font-size: 20px; font-weight: 600; margin: 40px 0 16px; color: var(--text-main);">Danh sách của bạn</h2>
+                <h2 style="font-size: 20px; font-weight: 600; margin: 40px 0 16px; color: var(--text-main);" data-i18n="cat_manage.list_title">Danh sách của bạn</h2>
                 <div id="category-list">
-                    <p class="text-center" style="color: var(--text-muted);">Đang tải dữ liệu...</p>
+                    <p class="text-center" style="color: var(--text-muted);" data-i18n="cat_manage.loading">Đang tải dữ liệu...</p>
                 </div>
             </div>
         </main>
@@ -128,7 +118,7 @@
                 
                 const listDiv = document.getElementById('category-list');
                 if(data.length === 0) {
-                    listDiv.innerHTML = '<p class="text-center" style="color: var(--text-muted);">Chưa có danh mục nào</p>';
+                    listDiv.innerHTML = `<p class="text-center" style="color: var(--text-muted);">${t('cat_manage.no_cat')}</p>`;
                     return;
                 }
 
@@ -140,7 +130,7 @@
                             </div>
                             <div>
                                 <b style="font-size: 16px; color: var(--text-main);">${c.name}</b> <br>
-                                <span style="font-size: 13px; color: var(--text-muted); font-weight: 500;">${c.type === 'expense' ? 'Khoản Chi' : 'Khoản Thu'}</span>
+                                <span style="font-size: 13px; color: var(--text-muted); font-weight: 500;">${c.type === 'expense' ? t('cat_manage.type_expense') : t('cat_manage.type_income')}</span>
                             </div>
                         </div>
                         <div style="display: flex; gap: 8px;">
@@ -162,13 +152,13 @@
             selectIcon(icon);
 
             // Đổi giao diện form
-            document.getElementById('form-heading').textContent = "Sửa Danh Mục";
+            document.getElementById('form-heading').textContent = t('cat_manage.edit_title');
             document.getElementById('cancel-edit-btn').style.display = 'block';
             
             const submitBtn = document.getElementById('submit-cat-btn');
             submitBtn.style.background = 'var(--warning-color)';
             document.getElementById('submit-icon').textContent = 'save';
-            document.getElementById('submit-text').textContent = 'CẬP NHẬT LẠI';
+            document.getElementById('submit-text').textContent = t('cat_manage.btn_update');
 
             // Cuộn mượt lên form
             document.querySelector('.main-content').scrollTo({ top: 0, behavior: 'smooth' });
@@ -182,13 +172,13 @@
             document.getElementById('type-note').style.display = 'none';
             selectIcon('other_expense');
 
-            document.getElementById('form-heading').textContent = "Thêm Danh Mục Mới";
+            document.getElementById('form-heading').textContent = t('cat_manage.add_title');
             document.getElementById('cancel-edit-btn').style.display = 'none';
             
             const submitBtn = document.getElementById('submit-cat-btn');
             submitBtn.style.background = 'var(--primary-color)';
             document.getElementById('submit-icon').textContent = 'add_circle';
-            document.getElementById('submit-text').textContent = 'THÊM DANH MỤC MỚI';
+            document.getElementById('submit-text').textContent = t('cat_manage.btn_add');
         }
 
         // Gộp chung hàm Thêm và Cập nhật
@@ -196,7 +186,7 @@
             const name = document.getElementById('cat-name').value;
             const type = document.getElementById('cat-type').value;
             const icon = document.getElementById('cat-icon').value;
-            if(!name.trim()) return alert("Vui lòng nhập tên danh mục!");
+            if(!name.trim()) return alert(t('cat_manage.name_required'));
             
             try {
                 if (editingCategoryId) {
@@ -218,12 +208,12 @@
                 }
                 loadCategories();
             } catch (err) {
-                alert("Lỗi kết nối đến máy chủ!");
+                alert(t('cat_manage.server_error'));
             }
         }
         
         async function deleteCat(id) {
-            if(confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
+            if(confirm(t('cat_manage.confirm_delete'))) {
                 await fetch(`/api/categories/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }});
                 // Nếu đang sửa danh mục vừa xóa, hủy sửa luôn
                 if (editingCategoryId === id) cancelEdit();
@@ -234,5 +224,6 @@
         renderIconPicker();
         loadCategories();
     </script>
+<script src="/js/sidebar.js"></script>
 </body>
 </html>

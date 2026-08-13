@@ -171,11 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const confirmPassword = confirmPasswordInput.value;
         const otpCode = document.getElementById('otpCode').value.trim();
         
-        if (!email.endsWith('@gmail.com')) {
-            return showMessage('Email phải có định dạng đuôi là @gmail.com');
+        if (!/^[^\s@]+@[^\s@]+\.(com|edu|vn|org|net|edu\.vn|com\.vn)$/i.test(email)) {
+            return showMessage('Email không hợp lệ! Hỗ trợ các đuôi: .com, .edu, .vn, .org, .net');
         }
 
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
 
         let url = '';
         let payload = {};
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!fullName) return showMessage('Vui lòng nhập họ và tên!');
             if (!/^\d{10}$/.test(phone)) return showMessage('Số điện thoại không hợp lệ! Phải bao gồm 10 chữ số.');
             if (password !== confirmPassword) return showMessage('Mật khẩu xác nhận không khớp!');
-            if (!passwordRegex.test(password)) return showMessage('Mật khẩu phải có ít nhất 6 ký tự, bao gồm cả chữ và số!');
+            if (!passwordRegex.test(password)) return showMessage('Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường và số!');
 
             url = '/api/auth/register';
             payload = { fullName, username: email, phone, password };
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (currentMode === 'RESET') {
             if (otpCode.length !== 6) return showMessage('Vui lòng nhập đủ 6 số OTP!');
             if (password !== confirmPassword) return showMessage('Mật khẩu xác nhận không khớp!');
-            if (!passwordRegex.test(password)) return showMessage('Mật khẩu mới phải có ít nhất 6 ký tự, gồm cả chữ và số!');
+            if (!passwordRegex.test(password)) return showMessage('Mật khẩu mới phải có ít nhất 6 ký tự, gồm chữ hoa, chữ thường và số!');
             
             url = '/api/auth/reset-password';
             payload = { email: pendingEmail, otp: otpCode, newPassword: password };
